@@ -7,6 +7,10 @@ same as your application name (using $_ENV['OPENSHIFT_APP_NAME']).  You can name
 your application whatever you want.  However, the name of the database will always
 match the application so you might have to update .openshift/action_hooks/build.
 
+Security Warning
+----------------
+This quickstart doesn't enforce credentials are transmitted over https.
+
 
 Running on OpenShift
 ----------------------------
