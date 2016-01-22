@@ -8,10 +8,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__assets`
+-- Table structure for table `sfj8s_assets`
 --
 
-CREATE TABLE IF NOT EXISTS `#__assets` (
+CREATE TABLE IF NOT EXISTS `sfj8s_assets` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `parent_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Nested set parent.',
   `lft` int(11) NOT NULL DEFAULT 0 COMMENT 'Nested set lft.',
@@ -27,10 +27,10 @@ CREATE TABLE IF NOT EXISTS `#__assets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__assets`
+-- Dumping data for table `sfj8s_assets`
 --
 
-INSERT INTO `#__assets` (`id`, `parent_id`, `lft`, `rgt`, `level`, `name`, `title`, `rules`) VALUES
+INSERT INTO `sfj8s_assets` (`id`, `parent_id`, `lft`, `rgt`, `level`, `name`, `title`, `rules`) VALUES
 (1, 0, 0, 101, 0, 'root.1', 'Root Asset', '{"core.login.site":{"6":1,"2":1},"core.login.admin":{"6":1},"core.login.offline":{"6":1},"core.admin":{"8":1},"core.manage":{"7":1},"core.create":{"6":1,"3":1},"core.delete":{"6":1},"core.edit":{"6":1,"4":1},"core.edit.state":{"6":1,"5":1},"core.edit.own":{"6":1,"3":1}}'),
 (2, 1, 1, 2, 1, 'com_admin', 'com_admin', '{}'),
 (3, 1, 3, 6, 1, 'com_banners', 'com_banners', '{"core.admin":{"7":1},"core.manage":{"6":1},"core.create":[],"core.delete":[],"core.edit":[],"core.edit.state":[]}'),
@@ -86,10 +86,10 @@ INSERT INTO `#__assets` (`id`, `parent_id`, `lft`, `rgt`, `level`, `name`, `titl
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__associations`
+-- Table structure for table `sfj8s_associations`
 --
 
-CREATE TABLE IF NOT EXISTS `#__associations` (
+CREATE TABLE IF NOT EXISTS `sfj8s_associations` (
   `id` int(11) NOT NULL COMMENT 'A reference to the associated item.',
   `context` varchar(50) NOT NULL COMMENT 'The context of the associated item.',
   `key` char(32) NOT NULL COMMENT 'The key for the association computed from an md5 on associated ids.',
@@ -100,10 +100,10 @@ CREATE TABLE IF NOT EXISTS `#__associations` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__banners`
+-- Table structure for table `sfj8s_banners`
 --
 
-CREATE TABLE IF NOT EXISTS `#__banners` (
+CREATE TABLE IF NOT EXISTS `sfj8s_banners` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `cid` int(11) NOT NULL DEFAULT 0,
   `type` int(11) NOT NULL DEFAULT 0,
@@ -149,10 +149,10 @@ CREATE TABLE IF NOT EXISTS `#__banners` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__banner_clients`
+-- Table structure for table `sfj8s_banner_clients`
 --
 
-CREATE TABLE IF NOT EXISTS `#__banner_clients` (
+CREATE TABLE IF NOT EXISTS `sfj8s_banner_clients` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `contact` varchar(255) NOT NULL DEFAULT '',
@@ -175,10 +175,10 @@ CREATE TABLE IF NOT EXISTS `#__banner_clients` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__banner_tracks`
+-- Table structure for table `sfj8s_banner_tracks`
 --
 
-CREATE TABLE IF NOT EXISTS `#__banner_tracks` (
+CREATE TABLE IF NOT EXISTS `sfj8s_banner_tracks` (
   `track_date` datetime NOT NULL,
   `track_type` int(10) unsigned NOT NULL,
   `banner_id` int(10) unsigned NOT NULL,
@@ -192,12 +192,12 @@ CREATE TABLE IF NOT EXISTS `#__banner_tracks` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__categories`
+-- Table structure for table `sfj8s_categories`
 --
 
-CREATE TABLE IF NOT EXISTS `#__categories` (
+CREATE TABLE IF NOT EXISTS `sfj8s_categories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `asset_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to the #__assets table.',
+  `asset_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to the sfj8s_assets table.',
   `parent_id` int(10) unsigned NOT NULL DEFAULT 0,
   `lft` int(11) NOT NULL DEFAULT 0,
   `rgt` int(11) NOT NULL DEFAULT 0,
@@ -234,10 +234,10 @@ CREATE TABLE IF NOT EXISTS `#__categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__categories`
+-- Dumping data for table `sfj8s_categories`
 --
 
-INSERT INTO `#__categories` (`id`, `asset_id`, `parent_id`, `lft`, `rgt`, `level`, `path`, `extension`, `title`, `alias`, `note`, `description`, `published`, `checked_out`, `checked_out_time`, `access`, `params`, `metadesc`, `metakey`, `metadata`, `created_user_id`, `created_time`, `modified_user_id`, `modified_time`, `hits`, `language`, `version`) VALUES
+INSERT INTO `sfj8s_categories` (`id`, `asset_id`, `parent_id`, `lft`, `rgt`, `level`, `path`, `extension`, `title`, `alias`, `note`, `description`, `published`, `checked_out`, `checked_out_time`, `access`, `params`, `metadesc`, `metakey`, `metadata`, `created_user_id`, `created_time`, `modified_user_id`, `modified_time`, `hits`, `language`, `version`) VALUES
 (1, 0, 0, 0, 11, 0, '', 'system', 'ROOT', 'root', '', '', 1, 0, '0000-00-00 00:00:00', 1, '{}', '', '', '{}', 42, '2011-01-01 00:00:01', 0, '0000-00-00 00:00:00', 0, '*', 1),
 (2, 27, 1, 1, 2, 1, 'uncategorised', 'com_content', 'Uncategorised', 'uncategorised', '', '', 1, 0, '0000-00-00 00:00:00', 1, '{"category_layout":"","image":""}', '', '', '{"author":"","robots":""}', 42, '2011-01-01 00:00:01', 0, '0000-00-00 00:00:00', 0, '*', 1),
 (3, 28, 1, 3, 4, 1, 'uncategorised', 'com_banners', 'Uncategorised', 'uncategorised', '', '', 1, 0, '0000-00-00 00:00:00', 1, '{"category_layout":"","image":""}', '', '', '{"author":"","robots":""}', 42, '2011-01-01 00:00:01', 0, '0000-00-00 00:00:00', 0, '*', 1),
@@ -248,10 +248,10 @@ INSERT INTO `#__categories` (`id`, `asset_id`, `parent_id`, `lft`, `rgt`, `level
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__contact_details`
+-- Table structure for table `sfj8s_contact_details`
 --
 
-CREATE TABLE IF NOT EXISTS `#__contact_details` (
+CREATE TABLE IF NOT EXISTS `sfj8s_contact_details` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
@@ -309,12 +309,12 @@ CREATE TABLE IF NOT EXISTS `#__contact_details` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__content`
+-- Table structure for table `sfj8s_content`
 --
 
-CREATE TABLE IF NOT EXISTS `#__content` (
+CREATE TABLE IF NOT EXISTS `sfj8s_content` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `asset_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to the #__assets table.',
+  `asset_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to the sfj8s_assets table.',
   `title` varchar(255) NOT NULL DEFAULT '',
   `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `introtext` mediumtext NOT NULL,
@@ -357,10 +357,10 @@ CREATE TABLE IF NOT EXISTS `#__content` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__content_frontpage`
+-- Table structure for table `sfj8s_content_frontpage`
 --
 
-CREATE TABLE IF NOT EXISTS `#__content_frontpage` (
+CREATE TABLE IF NOT EXISTS `sfj8s_content_frontpage` (
   `content_id` int(11) NOT NULL DEFAULT 0,
   `ordering` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`content_id`)
@@ -369,10 +369,10 @@ CREATE TABLE IF NOT EXISTS `#__content_frontpage` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__content_rating`
+-- Table structure for table `sfj8s_content_rating`
 --
 
-CREATE TABLE IF NOT EXISTS `#__content_rating` (
+CREATE TABLE IF NOT EXISTS `sfj8s_content_rating` (
   `content_id` int(11) NOT NULL DEFAULT 0,
   `rating_sum` int(10) unsigned NOT NULL DEFAULT 0,
   `rating_count` int(10) unsigned NOT NULL DEFAULT 0,
@@ -383,10 +383,10 @@ CREATE TABLE IF NOT EXISTS `#__content_rating` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__content_types`
+-- Table structure for table `sfj8s_content_types`
 --
 
-CREATE TABLE IF NOT EXISTS `#__content_types` (
+CREATE TABLE IF NOT EXISTS `sfj8s_content_types` (
   `type_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type_title` varchar(255) NOT NULL DEFAULT '',
   `type_alias` varchar(255) NOT NULL DEFAULT '',
@@ -400,31 +400,31 @@ CREATE TABLE IF NOT EXISTS `#__content_types` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=10000;
 
 --
--- Dumping data for table `#__content_types`
+-- Dumping data for table `sfj8s_content_types`
 --
 
-INSERT INTO `#__content_types` (`type_id`, `type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) VALUES
-(1, 'Article', 'com_content.article', '{"special":{"dbtable":"#__content","key":"id","type":"Content","prefix":"JTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"state","core_alias":"alias","core_created_time":"created","core_modified_time":"modified","core_body":"introtext", "core_hits":"hits","core_publish_up":"publish_up","core_publish_down":"publish_down","core_access":"access", "core_params":"attribs", "core_featured":"featured", "core_metadata":"metadata", "core_language":"language", "core_images":"images", "core_urls":"urls", "core_version":"version", "core_ordering":"ordering", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"catid", "core_xreference":"xreference", "asset_id":"asset_id"}, "special":{"fulltext":"fulltext"}}', 'ContentHelperRoute::getArticleRoute', '{"formFile":"administrator\\/components\\/com_content\\/models\\/forms\\/article.xml", "hideFields":["asset_id","checked_out","checked_out_time","version"],"ignoreChanges":["modified_by", "modified", "checked_out", "checked_out_time", "version", "hits"],"convertToInt":["publish_up", "publish_down", "featured", "ordering"],"displayLookup":[{"sourceColumn":"catid","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"created_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"} ]}'),
-(2, 'Contact', 'com_contact.contact', '{"special":{"dbtable":"#__contact_details","key":"id","type":"Contact","prefix":"ContactTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"name","core_state":"published","core_alias":"alias","core_created_time":"created","core_modified_time":"modified","core_body":"address", "core_hits":"hits","core_publish_up":"publish_up","core_publish_down":"publish_down","core_access":"access", "core_params":"params", "core_featured":"featured", "core_metadata":"metadata", "core_language":"language", "core_images":"image", "core_urls":"webpage", "core_version":"version", "core_ordering":"ordering", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"catid", "core_xreference":"xreference", "asset_id":"null"}, "special":{"con_position":"con_position","suburb":"suburb","state":"state","country":"country","postcode":"postcode","telephone":"telephone","fax":"fax","misc":"misc","email_to":"email_to","default_con":"default_con","user_id":"user_id","mobile":"mobile","sortname1":"sortname1","sortname2":"sortname2","sortname3":"sortname3"}}', 'ContactHelperRoute::getContactRoute', '{"formFile":"administrator\\/components\\/com_contact\\/models\\/forms\\/contact.xml","hideFields":["default_con","checked_out","checked_out_time","version","xreference"],"ignoreChanges":["modified_by", "modified", "checked_out", "checked_out_time", "version", "hits"],"convertToInt":["publish_up", "publish_down", "featured", "ordering"], "displayLookup":[ {"sourceColumn":"created_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"catid","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"} ] }'),
-(3, 'Newsfeed', 'com_newsfeeds.newsfeed', '{"special":{"dbtable":"#__newsfeeds","key":"id","type":"Newsfeed","prefix":"NewsfeedsTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"name","core_state":"published","core_alias":"alias","core_created_time":"created","core_modified_time":"modified","core_body":"description", "core_hits":"hits","core_publish_up":"publish_up","core_publish_down":"publish_down","core_access":"access", "core_params":"params", "core_featured":"featured", "core_metadata":"metadata", "core_language":"language", "core_images":"images", "core_urls":"link", "core_version":"version", "core_ordering":"ordering", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"catid", "core_xreference":"xreference", "asset_id":"null"}, "special":{"numarticles":"numarticles","cache_time":"cache_time","rtl":"rtl"}}', 'NewsfeedsHelperRoute::getNewsfeedRoute', '{"formFile":"administrator\\/components\\/com_newsfeeds\\/models\\/forms\\/newsfeed.xml","hideFields":["asset_id","checked_out","checked_out_time","version"],"ignoreChanges":["modified_by", "modified", "checked_out", "checked_out_time", "version", "hits"],"convertToInt":["publish_up", "publish_down", "featured", "ordering"],"displayLookup":[{"sourceColumn":"catid","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"created_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"} ]}'),
-(4, 'User', 'com_users.user', '{"special":{"dbtable":"#__users","key":"id","type":"User","prefix":"JTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"name","core_state":"null","core_alias":"username","core_created_time":"registerdate","core_modified_time":"lastvisitDate","core_body":"null", "core_hits":"null","core_publish_up":"null","core_publish_down":"null","access":"null", "core_params":"params", "core_featured":"null", "core_metadata":"null", "core_language":"null", "core_images":"null", "core_urls":"null", "core_version":"null", "core_ordering":"null", "core_metakey":"null", "core_metadesc":"null", "core_catid":"null", "core_xreference":"null", "asset_id":"null"}, "special":{}}', 'UsersHelperRoute::getUserRoute', ''),
-(5, 'Article Category', 'com_content.category', '{"special":{"dbtable":"#__categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}', 'ContentHelperRoute::getCategoryRoute', '{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["asset_id","checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"],"convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"}]}'),
-(6, 'Contact Category', 'com_contact.category', '{"special":{"dbtable":"#__categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}', 'ContactHelperRoute::getCategoryRoute', '{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["asset_id","checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"],"convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"}]}'),
-(7, 'Newsfeeds Category', 'com_newsfeeds.category', '{"special":{"dbtable":"#__categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}', 'NewsfeedsHelperRoute::getCategoryRoute', '{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["asset_id","checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"],"convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"}]}'),
-(8, 'Tag', 'com_tags.tag', '{"special":{"dbtable":"#__tags","key":"tag_id","type":"Tag","prefix":"TagsTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"featured", "core_metadata":"metadata", "core_language":"language", "core_images":"images", "core_urls":"urls", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"null", "core_xreference":"null", "asset_id":"null"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path"}}', 'TagsHelperRoute::getTagRoute', '{"formFile":"administrator\\/components\\/com_tags\\/models\\/forms\\/tag.xml", "hideFields":["checked_out","checked_out_time","version", "lft", "rgt", "level", "path", "urls", "publish_up", "publish_down"],"ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"],"convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"}, {"sourceColumn":"modified_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"}]}'),
-(9, 'Banner', 'com_banners.banner', '{"special":{"dbtable":"#__banners","key":"id","type":"Banner","prefix":"BannersTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"name","core_state":"published","core_alias":"alias","core_created_time":"created","core_modified_time":"modified","core_body":"description", "core_hits":"null","core_publish_up":"publish_up","core_publish_down":"publish_down","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"images", "core_urls":"link", "core_version":"version", "core_ordering":"ordering", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"catid", "core_xreference":"null", "asset_id":"null"}, "special":{"imptotal":"imptotal", "impmade":"impmade", "clicks":"clicks", "clickurl":"clickurl", "custombannercode":"custombannercode", "cid":"cid", "purchase_type":"purchase_type", "track_impressions":"track_impressions", "track_clicks":"track_clicks"}}', '','{"formFile":"administrator\\/components\\/com_banners\\/models\\/forms\\/banner.xml", "hideFields":["checked_out","checked_out_time","version", "reset"],"ignoreChanges":["modified_by", "modified", "checked_out", "checked_out_time", "version", "imptotal", "impmade", "reset"], "convertToInt":["publish_up", "publish_down", "ordering"], "displayLookup":[{"sourceColumn":"catid","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"}, {"sourceColumn":"cid","targetTable":"#__banner_clients","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"created_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"modified_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"} ]}'),
-(10, 'Banners Category', 'com_banners.category', '{"special":{"dbtable":"#__categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special": {"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}','','{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["asset_id","checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"], "convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"}]}'),
-(11, 'Banner Client', 'com_banners.client', '{"special":{"dbtable":"#__banner_clients","key":"id","type":"Client","prefix":"BannersTable"}}', '', '', '', '{"formFile":"administrator\\/components\\/com_banners\\/models\\/forms\\/client.xml", "hideFields":["checked_out","checked_out_time"], "ignoreChanges":["checked_out", "checked_out_time"], "convertToInt":[], "displayLookup":[]}'),
-(12, 'User Notes', 'com_users.note', '{"special":{"dbtable":"#__user_notes","key":"id","type":"Note","prefix":"UsersTable"}}', '', '', '', '{"formFile":"administrator\\/components\\/com_users\\/models\\/forms\\/note.xml", "hideFields":["checked_out","checked_out_time", "publish_up", "publish_down"],"ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time"], "convertToInt":["publish_up", "publish_down"],"displayLookup":[{"sourceColumn":"catid","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"}, {"sourceColumn":"created_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"modified_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"}]}'),
-(13, 'User Notes Category', 'com_users.category', '{"special":{"dbtable":"#__categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}', '', '{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"], "convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"#__users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"}]}');
+INSERT INTO `sfj8s_content_types` (`type_id`, `type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) VALUES
+(1, 'Article', 'com_content.article', '{"special":{"dbtable":"sfj8s_content","key":"id","type":"Content","prefix":"JTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"state","core_alias":"alias","core_created_time":"created","core_modified_time":"modified","core_body":"introtext", "core_hits":"hits","core_publish_up":"publish_up","core_publish_down":"publish_down","core_access":"access", "core_params":"attribs", "core_featured":"featured", "core_metadata":"metadata", "core_language":"language", "core_images":"images", "core_urls":"urls", "core_version":"version", "core_ordering":"ordering", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"catid", "core_xreference":"xreference", "asset_id":"asset_id"}, "special":{"fulltext":"fulltext"}}', 'ContentHelperRoute::getArticleRoute', '{"formFile":"administrator\\/components\\/com_content\\/models\\/forms\\/article.xml", "hideFields":["asset_id","checked_out","checked_out_time","version"],"ignoreChanges":["modified_by", "modified", "checked_out", "checked_out_time", "version", "hits"],"convertToInt":["publish_up", "publish_down", "featured", "ordering"],"displayLookup":[{"sourceColumn":"catid","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"created_by","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"sfj8s_viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_by","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"} ]}'),
+(2, 'Contact', 'com_contact.contact', '{"special":{"dbtable":"sfj8s_contact_details","key":"id","type":"Contact","prefix":"ContactTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"name","core_state":"published","core_alias":"alias","core_created_time":"created","core_modified_time":"modified","core_body":"address", "core_hits":"hits","core_publish_up":"publish_up","core_publish_down":"publish_down","core_access":"access", "core_params":"params", "core_featured":"featured", "core_metadata":"metadata", "core_language":"language", "core_images":"image", "core_urls":"webpage", "core_version":"version", "core_ordering":"ordering", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"catid", "core_xreference":"xreference", "asset_id":"null"}, "special":{"con_position":"con_position","suburb":"suburb","state":"state","country":"country","postcode":"postcode","telephone":"telephone","fax":"fax","misc":"misc","email_to":"email_to","default_con":"default_con","user_id":"user_id","mobile":"mobile","sortname1":"sortname1","sortname2":"sortname2","sortname3":"sortname3"}}', 'ContactHelperRoute::getContactRoute', '{"formFile":"administrator\\/components\\/com_contact\\/models\\/forms\\/contact.xml","hideFields":["default_con","checked_out","checked_out_time","version","xreference"],"ignoreChanges":["modified_by", "modified", "checked_out", "checked_out_time", "version", "hits"],"convertToInt":["publish_up", "publish_down", "featured", "ordering"], "displayLookup":[ {"sourceColumn":"created_by","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"catid","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_by","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"sfj8s_viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"} ] }'),
+(3, 'Newsfeed', 'com_newsfeeds.newsfeed', '{"special":{"dbtable":"sfj8s_newsfeeds","key":"id","type":"Newsfeed","prefix":"NewsfeedsTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"name","core_state":"published","core_alias":"alias","core_created_time":"created","core_modified_time":"modified","core_body":"description", "core_hits":"hits","core_publish_up":"publish_up","core_publish_down":"publish_down","core_access":"access", "core_params":"params", "core_featured":"featured", "core_metadata":"metadata", "core_language":"language", "core_images":"images", "core_urls":"link", "core_version":"version", "core_ordering":"ordering", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"catid", "core_xreference":"xreference", "asset_id":"null"}, "special":{"numarticles":"numarticles","cache_time":"cache_time","rtl":"rtl"}}', 'NewsfeedsHelperRoute::getNewsfeedRoute', '{"formFile":"administrator\\/components\\/com_newsfeeds\\/models\\/forms\\/newsfeed.xml","hideFields":["asset_id","checked_out","checked_out_time","version"],"ignoreChanges":["modified_by", "modified", "checked_out", "checked_out_time", "version", "hits"],"convertToInt":["publish_up", "publish_down", "featured", "ordering"],"displayLookup":[{"sourceColumn":"catid","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"created_by","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"sfj8s_viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_by","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"} ]}'),
+(4, 'User', 'com_users.user', '{"special":{"dbtable":"sfj8s_users","key":"id","type":"User","prefix":"JTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"name","core_state":"null","core_alias":"username","core_created_time":"registerdate","core_modified_time":"lastvisitDate","core_body":"null", "core_hits":"null","core_publish_up":"null","core_publish_down":"null","access":"null", "core_params":"params", "core_featured":"null", "core_metadata":"null", "core_language":"null", "core_images":"null", "core_urls":"null", "core_version":"null", "core_ordering":"null", "core_metakey":"null", "core_metadesc":"null", "core_catid":"null", "core_xreference":"null", "asset_id":"null"}, "special":{}}', 'UsersHelperRoute::getUserRoute', ''),
+(5, 'Article Category', 'com_content.category', '{"special":{"dbtable":"sfj8s_categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}', 'ContentHelperRoute::getCategoryRoute', '{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["asset_id","checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"],"convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"sfj8s_viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"}]}'),
+(6, 'Contact Category', 'com_contact.category', '{"special":{"dbtable":"sfj8s_categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}', 'ContactHelperRoute::getCategoryRoute', '{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["asset_id","checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"],"convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"sfj8s_viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"}]}'),
+(7, 'Newsfeeds Category', 'com_newsfeeds.category', '{"special":{"dbtable":"sfj8s_categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}', 'NewsfeedsHelperRoute::getCategoryRoute', '{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["asset_id","checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"],"convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"sfj8s_viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"}]}'),
+(8, 'Tag', 'com_tags.tag', '{"special":{"dbtable":"sfj8s_tags","key":"tag_id","type":"Tag","prefix":"TagsTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"featured", "core_metadata":"metadata", "core_language":"language", "core_images":"images", "core_urls":"urls", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"null", "core_xreference":"null", "asset_id":"null"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path"}}', 'TagsHelperRoute::getTagRoute', '{"formFile":"administrator\\/components\\/com_tags\\/models\\/forms\\/tag.xml", "hideFields":["checked_out","checked_out_time","version", "lft", "rgt", "level", "path", "urls", "publish_up", "publish_down"],"ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"],"convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"access","targetTable":"sfj8s_viewlevels","targetColumn":"id","displayColumn":"title"}, {"sourceColumn":"modified_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"}]}'),
+(9, 'Banner', 'com_banners.banner', '{"special":{"dbtable":"sfj8s_banners","key":"id","type":"Banner","prefix":"BannersTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"name","core_state":"published","core_alias":"alias","core_created_time":"created","core_modified_time":"modified","core_body":"description", "core_hits":"null","core_publish_up":"publish_up","core_publish_down":"publish_down","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"images", "core_urls":"link", "core_version":"version", "core_ordering":"ordering", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"catid", "core_xreference":"null", "asset_id":"null"}, "special":{"imptotal":"imptotal", "impmade":"impmade", "clicks":"clicks", "clickurl":"clickurl", "custombannercode":"custombannercode", "cid":"cid", "purchase_type":"purchase_type", "track_impressions":"track_impressions", "track_clicks":"track_clicks"}}', '','{"formFile":"administrator\\/components\\/com_banners\\/models\\/forms\\/banner.xml", "hideFields":["checked_out","checked_out_time","version", "reset"],"ignoreChanges":["modified_by", "modified", "checked_out", "checked_out_time", "version", "imptotal", "impmade", "reset"], "convertToInt":["publish_up", "publish_down", "ordering"], "displayLookup":[{"sourceColumn":"catid","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"}, {"sourceColumn":"cid","targetTable":"sfj8s_banner_clients","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"created_by","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"modified_by","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"} ]}'),
+(10, 'Banners Category', 'com_banners.category', '{"special":{"dbtable":"sfj8s_categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special": {"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}','','{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["asset_id","checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"], "convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"access","targetTable":"sfj8s_viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"}]}'),
+(11, 'Banner Client', 'com_banners.client', '{"special":{"dbtable":"sfj8s_banner_clients","key":"id","type":"Client","prefix":"BannersTable"}}', '', '', '', '{"formFile":"administrator\\/components\\/com_banners\\/models\\/forms\\/client.xml", "hideFields":["checked_out","checked_out_time"], "ignoreChanges":["checked_out", "checked_out_time"], "convertToInt":[], "displayLookup":[]}'),
+(12, 'User Notes', 'com_users.note', '{"special":{"dbtable":"sfj8s_user_notes","key":"id","type":"Note","prefix":"UsersTable"}}', '', '', '', '{"formFile":"administrator\\/components\\/com_users\\/models\\/forms\\/note.xml", "hideFields":["checked_out","checked_out_time", "publish_up", "publish_down"],"ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time"], "convertToInt":["publish_up", "publish_down"],"displayLookup":[{"sourceColumn":"catid","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"}, {"sourceColumn":"created_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"modified_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"}]}'),
+(13, 'User Notes Category', 'com_users.category', '{"special":{"dbtable":"sfj8s_categories","key":"id","type":"Category","prefix":"JTable","config":"array()"},"common":{"dbtable":"sfj8s_ucm_content","key":"ucm_id","type":"Corecontent","prefix":"JTable","config":"array()"}}', '', '{"common":{"core_content_item_id":"id","core_title":"title","core_state":"published","core_alias":"alias","core_created_time":"created_time","core_modified_time":"modified_time","core_body":"description", "core_hits":"hits","core_publish_up":"null","core_publish_down":"null","core_access":"access", "core_params":"params", "core_featured":"null", "core_metadata":"metadata", "core_language":"language", "core_images":"null", "core_urls":"null", "core_version":"version", "core_ordering":"null", "core_metakey":"metakey", "core_metadesc":"metadesc", "core_catid":"parent_id", "core_xreference":"null", "asset_id":"asset_id"}, "special":{"parent_id":"parent_id","lft":"lft","rgt":"rgt","level":"level","path":"path","extension":"extension","note":"note"}}', '', '{"formFile":"administrator\\/components\\/com_categories\\/models\\/forms\\/category.xml", "hideFields":["checked_out","checked_out_time","version","lft","rgt","level","path","extension"], "ignoreChanges":["modified_user_id", "modified_time", "checked_out", "checked_out_time", "version", "hits", "path"], "convertToInt":["publish_up", "publish_down"], "displayLookup":[{"sourceColumn":"created_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"}, {"sourceColumn":"access","targetTable":"sfj8s_viewlevels","targetColumn":"id","displayColumn":"title"},{"sourceColumn":"modified_user_id","targetTable":"sfj8s_users","targetColumn":"id","displayColumn":"name"},{"sourceColumn":"parent_id","targetTable":"sfj8s_categories","targetColumn":"id","displayColumn":"title"}]}');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__contentitem_tag_map`
+-- Table structure for table `sfj8s_contentitem_tag_map`
 --
 
-CREATE TABLE IF NOT EXISTS `#__contentitem_tag_map` (
+CREATE TABLE IF NOT EXISTS `sfj8s_contentitem_tag_map` (
   `type_alias` varchar(255) NOT NULL DEFAULT '',
   `core_content_id` int(10) unsigned NOT NULL COMMENT 'PK from the core content table',
   `content_item_id` int(11) NOT NULL COMMENT 'PK from the content type table',
@@ -442,10 +442,10 @@ CREATE TABLE IF NOT EXISTS `#__contentitem_tag_map` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__core_log_searches`
+-- Table structure for table `sfj8s_core_log_searches`
 --
 
-CREATE TABLE IF NOT EXISTS `#__core_log_searches` (
+CREATE TABLE IF NOT EXISTS `sfj8s_core_log_searches` (
   `search_term` varchar(128) NOT NULL DEFAULT '',
   `hits` int(10) unsigned NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -453,10 +453,10 @@ CREATE TABLE IF NOT EXISTS `#__core_log_searches` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__extensions`
+-- Table structure for table `sfj8s_extensions`
 --
 
-CREATE TABLE IF NOT EXISTS `#__extensions` (
+CREATE TABLE IF NOT EXISTS `sfj8s_extensions` (
   `extension_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `type` varchar(20) NOT NULL,
@@ -481,10 +481,10 @@ CREATE TABLE IF NOT EXISTS `#__extensions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=10000;
 
 --
--- Dumping data for table `#__extensions`
+-- Dumping data for table `sfj8s_extensions`
 --
 
-INSERT INTO `#__extensions` (`extension_id`, `name`, `type`, `element`, `folder`, `client_id`, `enabled`, `access`, `protected`, `manifest_cache`, `params`, `custom_data`, `system_data`, `checked_out`, `checked_out_time`, `ordering`, `state`) VALUES
+INSERT INTO `sfj8s_extensions` (`extension_id`, `name`, `type`, `element`, `folder`, `client_id`, `enabled`, `access`, `protected`, `manifest_cache`, `params`, `custom_data`, `system_data`, `checked_out`, `checked_out_time`, `ordering`, `state`) VALUES
 (1, 'com_mailto', 'component', 'com_mailto', '', 0, 1, 1, 1, '', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
 (2, 'com_wrapper', 'component', 'com_wrapper', '', 0, 1, 1, 1, '', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
 (3, 'com_admin', 'component', 'com_admin', '', 1, 1, 1, 1, '', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
@@ -621,10 +621,10 @@ INSERT INTO `#__extensions` (`extension_id`, `name`, `type`, `element`, `folder`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_filters`
+-- Table structure for table `sfj8s_finder_filters`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_filters` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_filters` (
   `filter_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `alias` varchar(255) NOT NULL,
@@ -645,10 +645,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_filters` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links`
+-- Table structure for table `sfj8s_finder_links`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links` (
   `link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `url` varchar(255) NOT NULL,
   `route` varchar(255) NOT NULL,
@@ -680,10 +680,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms0`
+-- Table structure for table `sfj8s_finder_links_terms0`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms0` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms0` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -695,10 +695,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms0` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms1`
+-- Table structure for table `sfj8s_finder_links_terms1`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms1` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms1` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -710,10 +710,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms1` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms2`
+-- Table structure for table `sfj8s_finder_links_terms2`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms2` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms2` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -725,10 +725,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms2` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms3`
+-- Table structure for table `sfj8s_finder_links_terms3`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms3` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms3` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -740,10 +740,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms3` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms4`
+-- Table structure for table `sfj8s_finder_links_terms4`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms4` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms4` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -755,10 +755,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms4` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms5`
+-- Table structure for table `sfj8s_finder_links_terms5`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms5` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms5` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -770,10 +770,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms5` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms6`
+-- Table structure for table `sfj8s_finder_links_terms6`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms6` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms6` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -785,10 +785,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms6` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms7`
+-- Table structure for table `sfj8s_finder_links_terms7`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms7` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms7` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -800,10 +800,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms7` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms8`
+-- Table structure for table `sfj8s_finder_links_terms8`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms8` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms8` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -815,10 +815,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms8` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_terms9`
+-- Table structure for table `sfj8s_finder_links_terms9`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_terms9` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_terms9` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -830,10 +830,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_terms9` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_termsa`
+-- Table structure for table `sfj8s_finder_links_termsa`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_termsa` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_termsa` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -845,10 +845,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_termsa` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_termsb`
+-- Table structure for table `sfj8s_finder_links_termsb`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_termsb` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_termsb` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -860,10 +860,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_termsb` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_termsc`
+-- Table structure for table `sfj8s_finder_links_termsc`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_termsc` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_termsc` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -875,10 +875,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_termsc` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_termsd`
+-- Table structure for table `sfj8s_finder_links_termsd`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_termsd` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_termsd` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -890,10 +890,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_termsd` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_termse`
+-- Table structure for table `sfj8s_finder_links_termse`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_termse` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_termse` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -905,10 +905,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_termse` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_links_termsf`
+-- Table structure for table `sfj8s_finder_links_termsf`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_links_termsf` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_links_termsf` (
   `link_id` int(10) unsigned NOT NULL,
   `term_id` int(10) unsigned NOT NULL,
   `weight` float unsigned NOT NULL,
@@ -920,10 +920,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_links_termsf` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_taxonomy`
+-- Table structure for table `sfj8s_finder_taxonomy`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_taxonomy` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_taxonomy` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL,
@@ -939,19 +939,19 @@ CREATE TABLE IF NOT EXISTS `#__finder_taxonomy` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__finder_taxonomy`
+-- Dumping data for table `sfj8s_finder_taxonomy`
 --
 
-INSERT INTO `#__finder_taxonomy` (`id`, `parent_id`, `title`, `state`, `access`, `ordering`) VALUES
+INSERT INTO `sfj8s_finder_taxonomy` (`id`, `parent_id`, `title`, `state`, `access`, `ordering`) VALUES
 (1, 0, 'ROOT', 0, 0, 0);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_taxonomy_map`
+-- Table structure for table `sfj8s_finder_taxonomy_map`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_taxonomy_map` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_taxonomy_map` (
   `link_id` int(10) unsigned NOT NULL,
   `node_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`link_id`,`node_id`),
@@ -962,10 +962,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_taxonomy_map` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_terms`
+-- Table structure for table `sfj8s_finder_terms`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_terms` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_terms` (
   `term_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `term` varchar(75) NOT NULL,
   `stem` varchar(75) NOT NULL,
@@ -985,10 +985,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_terms` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_terms_common`
+-- Table structure for table `sfj8s_finder_terms_common`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_terms_common` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_terms_common` (
   `term` varchar(75) NOT NULL,
   `language` varchar(3) NOT NULL,
   KEY `idx_word_lang` (`term`,`language`),
@@ -996,10 +996,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_terms_common` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__finder_terms_common`
+-- Dumping data for table `sfj8s_finder_terms_common`
 --
 
-INSERT INTO `#__finder_terms_common` (`term`, `language`) VALUES
+INSERT INTO `sfj8s_finder_terms_common` (`term`, `language`) VALUES
 ('a', 'en'),
 ('about', 'en'),
 ('after', 'en'),
@@ -1119,10 +1119,10 @@ INSERT INTO `#__finder_terms_common` (`term`, `language`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_tokens`
+-- Table structure for table `sfj8s_finder_tokens`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_tokens` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_tokens` (
   `term` varchar(75) NOT NULL,
   `stem` varchar(75) NOT NULL,
   `common` tinyint(1) unsigned NOT NULL DEFAULT 0,
@@ -1137,10 +1137,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_tokens` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_tokens_aggregate`
+-- Table structure for table `sfj8s_finder_tokens_aggregate`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_tokens_aggregate` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_tokens_aggregate` (
   `term_id` int(10) unsigned NOT NULL,
   `map_suffix` char(1) NOT NULL,
   `term` varchar(75) NOT NULL,
@@ -1159,10 +1159,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_tokens_aggregate` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__finder_types`
+-- Table structure for table `sfj8s_finder_types`
 --
 
-CREATE TABLE IF NOT EXISTS `#__finder_types` (
+CREATE TABLE IF NOT EXISTS `sfj8s_finder_types` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL,
   `mime` varchar(100) NOT NULL,
@@ -1173,10 +1173,10 @@ CREATE TABLE IF NOT EXISTS `#__finder_types` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__languages`
+-- Table structure for table `sfj8s_languages`
 --
 
-CREATE TABLE IF NOT EXISTS `#__languages` (
+CREATE TABLE IF NOT EXISTS `sfj8s_languages` (
   `lang_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `lang_code` char(7) NOT NULL,
   `title` varchar(50) NOT NULL,
@@ -1199,21 +1199,21 @@ CREATE TABLE IF NOT EXISTS `#__languages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__languages`
+-- Dumping data for table `sfj8s_languages`
 --
 
-INSERT INTO `#__languages` (`lang_id`, `lang_code`, `title`, `title_native`, `sef`, `image`, `description`, `metakey`, `metadesc`, `sitename`, `published`, `access`, `ordering`) VALUES
+INSERT INTO `sfj8s_languages` (`lang_id`, `lang_code`, `title`, `title_native`, `sef`, `image`, `description`, `metakey`, `metadesc`, `sitename`, `published`, `access`, `ordering`) VALUES
 (1, 'en-GB', 'English (UK)', 'English (UK)', 'en', 'en', '', '', '', '', 1, 1, 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__menu`
+-- Table structure for table `sfj8s_menu`
 --
 
-CREATE TABLE IF NOT EXISTS `#__menu` (
+CREATE TABLE IF NOT EXISTS `sfj8s_menu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `menutype` varchar(24) NOT NULL COMMENT 'The type of menu this item belongs to. FK to #__menu_types.menutype',
+  `menutype` varchar(24) NOT NULL COMMENT 'The type of menu this item belongs to. FK to sfj8s_menu_types.menutype',
   `title` varchar(255) NOT NULL COMMENT 'The display title of the menu item.',
   `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'The SEF alias of the menu item.',
   `note` varchar(255) NOT NULL DEFAULT '',
@@ -1223,8 +1223,8 @@ CREATE TABLE IF NOT EXISTS `#__menu` (
   `published` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'The published state of the menu link.',
   `parent_id` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'The parent menu item in the menu tree.',
   `level` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'The relative level in the tree.',
-  `component_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to #__extensions.id',
-  `checked_out` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to #__users.id',
+  `component_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to sfj8s_extensions.id',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to sfj8s_users.id',
   `checked_out_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'The time the menu item was checked out.',
   `browserNav` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'The click behaviour of the link.',
   `access` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'The access level required to view the menu item.',
@@ -1247,10 +1247,10 @@ CREATE TABLE IF NOT EXISTS `#__menu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=102;
 
 --
--- Dumping data for table `#__menu`
+-- Dumping data for table `sfj8s_menu`
 --
 
-INSERT INTO `#__menu` (`id`, `menutype`, `title`, `alias`, `note`, `path`, `link`, `type`, `published`, `parent_id`, `level`, `component_id`, `checked_out`, `checked_out_time`, `browserNav`, `access`, `img`, `template_style_id`, `params`, `lft`, `rgt`, `home`, `language`, `client_id`) VALUES
+INSERT INTO `sfj8s_menu` (`id`, `menutype`, `title`, `alias`, `note`, `path`, `link`, `type`, `published`, `parent_id`, `level`, `component_id`, `checked_out`, `checked_out_time`, `browserNav`, `access`, `img`, `template_style_id`, `params`, `lft`, `rgt`, `home`, `language`, `client_id`) VALUES
 (1, '', 'Menu_Item_Root', 'root', '', '', '', '', 1, 0, 0, 0, 0, '0000-00-00 00:00:00', 0, 0, '', 0, '', 0, 43, 0, '*', 0),
 (2, 'menu', 'com_banners', 'Banners', '', 'Banners', 'index.php?option=com_banners', 'component', 0, 1, 1, 4, 0, '0000-00-00 00:00:00', 0, 0, 'class:banners', 0, '', 1, 10, 0, '*', 1),
 (3, 'menu', 'com_banners', 'Banners', '', 'Banners/Banners', 'index.php?option=com_banners', 'component', 0, 2, 2, 4, 0, '0000-00-00 00:00:00', 0, 0, 'class:banners', 0, '', 2, 3, 0, '*', 1),
@@ -1277,10 +1277,10 @@ INSERT INTO `#__menu` (`id`, `menutype`, `title`, `alias`, `note`, `path`, `link
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__menu_types`
+-- Table structure for table `sfj8s_menu_types`
 --
 
-CREATE TABLE IF NOT EXISTS `#__menu_types` (
+CREATE TABLE IF NOT EXISTS `sfj8s_menu_types` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `menutype` varchar(24) NOT NULL,
   `title` varchar(48) NOT NULL,
@@ -1290,19 +1290,19 @@ CREATE TABLE IF NOT EXISTS `#__menu_types` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__menu_types`
+-- Dumping data for table `sfj8s_menu_types`
 --
 
-INSERT INTO `#__menu_types` (`id`, `menutype`, `title`, `description`) VALUES
+INSERT INTO `sfj8s_menu_types` (`id`, `menutype`, `title`, `description`) VALUES
 (1, 'mainmenu', 'Main Menu', 'The main menu for the site');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__messages`
+-- Table structure for table `sfj8s_messages`
 --
 
-CREATE TABLE IF NOT EXISTS `#__messages` (
+CREATE TABLE IF NOT EXISTS `sfj8s_messages` (
   `message_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id_from` int(10) unsigned NOT NULL DEFAULT 0,
   `user_id_to` int(10) unsigned NOT NULL DEFAULT 0,
@@ -1319,10 +1319,10 @@ CREATE TABLE IF NOT EXISTS `#__messages` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__messages_cfg`
+-- Table structure for table `sfj8s_messages_cfg`
 --
 
-CREATE TABLE IF NOT EXISTS `#__messages_cfg` (
+CREATE TABLE IF NOT EXISTS `sfj8s_messages_cfg` (
   `user_id` int(10) unsigned NOT NULL DEFAULT 0,
   `cfg_name` varchar(100) NOT NULL DEFAULT '',
   `cfg_value` varchar(255) NOT NULL DEFAULT '',
@@ -1332,12 +1332,12 @@ CREATE TABLE IF NOT EXISTS `#__messages_cfg` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__modules`
+-- Table structure for table `sfj8s_modules`
 --
 
-CREATE TABLE IF NOT EXISTS `#__modules` (
+CREATE TABLE IF NOT EXISTS `sfj8s_modules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `asset_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to the #__assets table.',
+  `asset_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to the sfj8s_assets table.',
   `title` varchar(100) NOT NULL DEFAULT '',
   `note` varchar(255) NOT NULL DEFAULT '',
   `content` text NOT NULL,
@@ -1361,10 +1361,10 @@ CREATE TABLE IF NOT EXISTS `#__modules` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=87;
 
 --
--- Dumping data for table `#__modules`
+-- Dumping data for table `sfj8s_modules`
 --
 
-INSERT INTO `#__modules` (`id`, `asset_id`, `title`, `note`, `content`, `ordering`, `position`, `checked_out`, `checked_out_time`, `publish_up`, `publish_down`, `published`, `module`, `access`, `showtitle`, `params`, `client_id`, `language`) VALUES
+INSERT INTO `sfj8s_modules` (`id`, `asset_id`, `title`, `note`, `content`, `ordering`, `position`, `checked_out`, `checked_out_time`, `publish_up`, `publish_down`, `published`, `module`, `access`, `showtitle`, `params`, `client_id`, `language`) VALUES
 (1, 39, 'Main Menu', '', '', 1, 'position-7', 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 1, 'mod_menu', 1, 1, '{"menutype":"mainmenu","startLevel":"0","endLevel":"0","showAllChildren":"0","tag_id":"","class_sfx":"","window_open":"","layout":"","moduleclass_sfx":"_menu","cache":"1","cache_time":"900","cachemode":"itemid"}', 0, '*'),
 (2, 40, 'Login', '', '', 1, 'login', 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 1, 'mod_login', 1, 1, '', 1, '*'),
 (3, 41, 'Popular Articles', '', '', 3, 'cpanel', 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 1, 'mod_popular', 3, 1, '{"count":"5","catid":"","user_id":"0","layout":"_:default","moduleclass_sfx":"","cache":"0"}', 1, '*'),
@@ -1384,20 +1384,20 @@ INSERT INTO `#__modules` (`id`, `asset_id`, `title`, `note`, `content`, `orderin
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__modules_menu`
+-- Table structure for table `sfj8s_modules_menu`
 --
 
-CREATE TABLE IF NOT EXISTS `#__modules_menu` (
+CREATE TABLE IF NOT EXISTS `sfj8s_modules_menu` (
   `moduleid` int(11) NOT NULL DEFAULT 0,
   `menuid` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`moduleid`,`menuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__modules_menu`
+-- Dumping data for table `sfj8s_modules_menu`
 --
 
-INSERT INTO `#__modules_menu` (`moduleid`, `menuid`) VALUES
+INSERT INTO `sfj8s_modules_menu` (`moduleid`, `menuid`) VALUES
 (1, 0),
 (2, 0),
 (3, 0),
@@ -1419,10 +1419,10 @@ INSERT INTO `#__modules_menu` (`moduleid`, `menuid`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__newsfeeds`
+-- Table structure for table `sfj8s_newsfeeds`
 --
 
-CREATE TABLE IF NOT EXISTS `#__newsfeeds` (
+CREATE TABLE IF NOT EXISTS `sfj8s_newsfeeds` (
   `catid` int(11) NOT NULL DEFAULT 0,
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
@@ -1466,10 +1466,10 @@ CREATE TABLE IF NOT EXISTS `#__newsfeeds` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__overrider`
+-- Table structure for table `sfj8s_overrider`
 --
 
-CREATE TABLE IF NOT EXISTS `#__overrider` (
+CREATE TABLE IF NOT EXISTS `sfj8s_overrider` (
   `id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `constant` varchar(255) NOT NULL,
   `string` text NOT NULL,
@@ -1480,12 +1480,12 @@ CREATE TABLE IF NOT EXISTS `#__overrider` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__postinstall_messages`
+-- Table structure for table `sfj8s_postinstall_messages`
 --
 
-CREATE TABLE IF NOT EXISTS `#__postinstall_messages` (
+CREATE TABLE IF NOT EXISTS `sfj8s_postinstall_messages` (
   `postinstall_message_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `extension_id` bigint(20) NOT NULL DEFAULT 700 COMMENT 'FK to #__extensions',
+  `extension_id` bigint(20) NOT NULL DEFAULT 700 COMMENT 'FK to sfj8s_extensions',
   `title_key` varchar(255) NOT NULL DEFAULT '' COMMENT 'Lang key for the title',
   `description_key` varchar(255) NOT NULL DEFAULT '' COMMENT 'Lang key for description',
   `action_key` varchar(255) NOT NULL DEFAULT '',
@@ -1502,20 +1502,20 @@ CREATE TABLE IF NOT EXISTS `#__postinstall_messages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__postinstall_messages`
+-- Dumping data for table `sfj8s_postinstall_messages`
 --
 
-INSERT INTO `#__postinstall_messages` (`extension_id`, `title_key`, `description_key`, `action_key`, `language_extension`, `language_client_id`, `type`, `action_file`, `action`, `condition_file`, `condition_method`, `version_introduced`, `enabled`) VALUES
+INSERT INTO `sfj8s_postinstall_messages` (`extension_id`, `title_key`, `description_key`, `action_key`, `language_extension`, `language_client_id`, `type`, `action_file`, `action`, `condition_file`, `condition_method`, `version_introduced`, `enabled`) VALUES
 (700, 'PLG_TWOFACTORAUTH_TOTP_POSTINSTALL_TITLE', 'PLG_TWOFACTORAUTH_TOTP_POSTINSTALL_BODY', 'PLG_TWOFACTORAUTH_TOTP_POSTINSTALL_ACTION', 'plg_twofactorauth_totp', 1, 'action', 'site://plugins/twofactorauth/totp/postinstall/actions.php', 'twofactorauth_postinstall_action', 'site://plugins/twofactorauth/totp/postinstall/actions.php', 'twofactorauth_postinstall_condition', '3.2.0', 1),
 (700, 'COM_CPANEL_WELCOME_BEGINNERS_TITLE', 'COM_CPANEL_WELCOME_BEGINNERS_MESSAGE', '', 'com_cpanel', 1, 'message', '', '', '', '', '3.2.0', 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__redirect_links`
+-- Table structure for table `sfj8s_redirect_links`
 --
 
-CREATE TABLE IF NOT EXISTS `#__redirect_links` (
+CREATE TABLE IF NOT EXISTS `sfj8s_redirect_links` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `old_url` varchar(255) NOT NULL,
   `new_url` varchar(255),
@@ -1534,10 +1534,10 @@ CREATE TABLE IF NOT EXISTS `#__redirect_links` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__schemas`
+-- Table structure for table `sfj8s_schemas`
 --
 
-CREATE TABLE IF NOT EXISTS `#__schemas` (
+CREATE TABLE IF NOT EXISTS `sfj8s_schemas` (
   `extension_id` int(11) NOT NULL,
   `version_id` varchar(20) NOT NULL,
   PRIMARY KEY (`extension_id`,`version_id`)
@@ -1546,10 +1546,10 @@ CREATE TABLE IF NOT EXISTS `#__schemas` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__session`
+-- Table structure for table `sfj8s_session`
 --
 
-CREATE TABLE IF NOT EXISTS `#__session` (
+CREATE TABLE IF NOT EXISTS `sfj8s_session` (
   `session_id` varchar(200) NOT NULL DEFAULT '',
   `client_id` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `guest` tinyint(4) unsigned DEFAULT 1,
@@ -1565,10 +1565,10 @@ CREATE TABLE IF NOT EXISTS `#__session` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__tags`
+-- Table structure for table `sfj8s_tags`
 --
 
-CREATE TABLE IF NOT EXISTS `#__tags` (
+CREATE TABLE IF NOT EXISTS `sfj8s_tags` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned NOT NULL DEFAULT 0,
   `lft` int(11) NOT NULL DEFAULT 0,
@@ -1610,19 +1610,19 @@ CREATE TABLE IF NOT EXISTS `#__tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__tags`
+-- Dumping data for table `sfj8s_tags`
 --
 
-INSERT INTO `#__tags` (`id`, `parent_id`, `lft`, `rgt`, `level`, `path`, `title`, `alias`, `note`, `description`, `published`, `checked_out`, `checked_out_time`, `access`, `params`, `metadesc`, `metakey`, `metadata`, `created_user_id`, `created_time`, `created_by_alias`, `modified_user_id`, `modified_time`, `images`, `urls`, `hits`, `language`, `version`) VALUES
+INSERT INTO `sfj8s_tags` (`id`, `parent_id`, `lft`, `rgt`, `level`, `path`, `title`, `alias`, `note`, `description`, `published`, `checked_out`, `checked_out_time`, `access`, `params`, `metadesc`, `metakey`, `metadata`, `created_user_id`, `created_time`, `created_by_alias`, `modified_user_id`, `modified_time`, `images`, `urls`, `hits`, `language`, `version`) VALUES
 (1, 0, 0, 1, 0, '', 'ROOT', 'root', '', '', 1, 0, '0000-00-00 00:00:00', 1, '', '', '', '', 42, '2011-01-01 00:00:01', '', 0, '0000-00-00 00:00:00', '', '', 0, '*', 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__template_styles`
+-- Table structure for table `sfj8s_template_styles`
 --
 
-CREATE TABLE IF NOT EXISTS `#__template_styles` (
+CREATE TABLE IF NOT EXISTS `sfj8s_template_styles` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `template` varchar(50) NOT NULL DEFAULT '',
   `client_id` tinyint(1) unsigned NOT NULL DEFAULT 0,
@@ -1635,10 +1635,10 @@ CREATE TABLE IF NOT EXISTS `#__template_styles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=9;
 
 --
--- Dumping data for table `#__template_styles`
+-- Dumping data for table `sfj8s_template_styles`
 --
 
-INSERT INTO `#__template_styles` (`id`, `template`, `client_id`, `home`, `title`, `params`) VALUES
+INSERT INTO `sfj8s_template_styles` (`id`, `template`, `client_id`, `home`, `title`, `params`) VALUES
 (4, 'beez3', 0, '0', 'Beez3 - Default', '{"wrapperSmall":"53","wrapperLarge":"72","logo":"images\\/joomla_black.png","sitetitle":"Joomla!","sitedescription":"Open Source Content Management","navposition":"left","templatecolor":"personal","html5":"0"}'),
 (5, 'hathor', 1, '0', 'Hathor - Default', '{"showSiteName":"0","colourChoice":"","boldText":"0"}'),
 (7, 'protostar', 0, '1', 'protostar - Default', '{"templateColor":"","logoFile":"","googleFont":"1","googleFontName":"Open+Sans","fluidContainer":"0"}'),
@@ -1647,10 +1647,10 @@ INSERT INTO `#__template_styles` (`id`, `template`, `client_id`, `home`, `title`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__ucm_base`
+-- Table structure for table `sfj8s_ucm_base`
 --
 
-CREATE TABLE IF NOT EXISTS `#__ucm_base` (
+CREATE TABLE IF NOT EXISTS `sfj8s_ucm_base` (
   `ucm_id` int(10) unsigned NOT NULL,
   `ucm_item_id` int(10) NOT NULL,
   `ucm_type_id` int(11) NOT NULL,
@@ -1664,10 +1664,10 @@ CREATE TABLE IF NOT EXISTS `#__ucm_base` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__ucm_content`
+-- Table structure for table `sfj8s_ucm_content`
 --
 
-CREATE TABLE IF NOT EXISTS `#__ucm_content` (
+CREATE TABLE IF NOT EXISTS `sfj8s_ucm_content` (
   `core_content_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `core_type_alias` varchar(255) NOT NULL DEFAULT '' COMMENT 'FK to the content types table',
   `core_title` varchar(255) NOT NULL,
@@ -1689,7 +1689,7 @@ CREATE TABLE IF NOT EXISTS `#__ucm_content` (
   `core_publish_up` datetime NOT NULL,
   `core_publish_down` datetime NOT NULL,
   `core_content_item_id` int(10) unsigned COMMENT 'ID from the individual type table',
-  `asset_id` int(10) unsigned COMMENT 'FK to the #__assets table.',
+  `asset_id` int(10) unsigned COMMENT 'FK to the sfj8s_assets table.',
   `core_images` text NOT NULL,
   `core_urls` text NOT NULL,
   `core_hits` int(10) unsigned NOT NULL DEFAULT 0,
@@ -1718,10 +1718,10 @@ CREATE TABLE IF NOT EXISTS `#__ucm_content` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__ucm_history`
+-- Table structure for table `sfj8s_ucm_history`
 --
 
-CREATE TABLE IF NOT EXISTS `#__ucm_history` (
+CREATE TABLE IF NOT EXISTS `sfj8s_ucm_history` (
   `version_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ucm_item_id` int(10) unsigned NOT NULL,
   `ucm_type_id` int(10) unsigned NOT NULL,
@@ -1740,10 +1740,10 @@ CREATE TABLE IF NOT EXISTS `#__ucm_history` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__updates`
+-- Table structure for table `sfj8s_updates`
 --
 
-CREATE TABLE IF NOT EXISTS `#__updates` (
+CREATE TABLE IF NOT EXISTS `sfj8s_updates` (
   `update_id` int(11) NOT NULL AUTO_INCREMENT,
   `update_site_id` int(11) DEFAULT 0,
   `extension_id` int(11) DEFAULT 0,
@@ -1764,10 +1764,10 @@ CREATE TABLE IF NOT EXISTS `#__updates` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__update_sites`
+-- Table structure for table `sfj8s_update_sites`
 --
 
-CREATE TABLE IF NOT EXISTS `#__update_sites` (
+CREATE TABLE IF NOT EXISTS `sfj8s_update_sites` (
   `update_site_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT '',
   `type` varchar(20) DEFAULT '',
@@ -1779,10 +1779,10 @@ CREATE TABLE IF NOT EXISTS `#__update_sites` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Update Sites';
 
 --
--- Dumping data for table `#__update_sites`
+-- Dumping data for table `sfj8s_update_sites`
 --
 
-INSERT INTO `#__update_sites` (`update_site_id`, `name`, `type`, `location`, `enabled`, `last_check_timestamp`) VALUES
+INSERT INTO `sfj8s_update_sites` (`update_site_id`, `name`, `type`, `location`, `enabled`, `last_check_timestamp`) VALUES
 (1, 'Joomla! Core', 'collection', 'http://update.joomla.org/core/list.xml', 1, 0),
 (2, 'Joomla! Extension Directory', 'collection', 'http://update.joomla.org/jed/list.xml', 1, 0),
 (3, 'Accredited Joomla! Translations', 'collection', 'http://update.joomla.org/language/translationlist_3.xml', 1, 0),
@@ -1791,20 +1791,20 @@ INSERT INTO `#__update_sites` (`update_site_id`, `name`, `type`, `location`, `en
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__update_sites_extensions`
+-- Table structure for table `sfj8s_update_sites_extensions`
 --
 
-CREATE TABLE IF NOT EXISTS `#__update_sites_extensions` (
+CREATE TABLE IF NOT EXISTS `sfj8s_update_sites_extensions` (
   `update_site_id` int(11) NOT NULL DEFAULT 0,
   `extension_id` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`update_site_id`,`extension_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Links extensions to update sites';
 
 --
--- Dumping data for table `#__update_sites_extensions`
+-- Dumping data for table `sfj8s_update_sites_extensions`
 --
 
-INSERT INTO `#__update_sites_extensions` (`update_site_id`, `extension_id`) VALUES
+INSERT INTO `sfj8s_update_sites_extensions` (`update_site_id`, `extension_id`) VALUES
 (1, 700),
 (2, 700),
 (3, 600),
@@ -1813,10 +1813,10 @@ INSERT INTO `#__update_sites_extensions` (`update_site_id`, `extension_id`) VALU
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__usergroups`
+-- Table structure for table `sfj8s_usergroups`
 --
 
-CREATE TABLE IF NOT EXISTS `#__usergroups` (
+CREATE TABLE IF NOT EXISTS `sfj8s_usergroups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `parent_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Adjacency List Reference Id',
   `lft` int(11) NOT NULL DEFAULT 0 COMMENT 'Nested set lft.',
@@ -1830,10 +1830,10 @@ CREATE TABLE IF NOT EXISTS `#__usergroups` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `#__usergroups`
+-- Dumping data for table `sfj8s_usergroups`
 --
 
-INSERT INTO `#__usergroups` (`id`, `parent_id`, `lft`, `rgt`, `title`) VALUES
+INSERT INTO `sfj8s_usergroups` (`id`, `parent_id`, `lft`, `rgt`, `title`) VALUES
 (1, 0, 1, 18, 'Public'),
 (2, 1, 8, 15, 'Registered'),
 (3, 2, 9, 14, 'Author'),
@@ -1847,10 +1847,10 @@ INSERT INTO `#__usergroups` (`id`, `parent_id`, `lft`, `rgt`, `title`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__users`
+-- Table structure for table `sfj8s_users`
 --
 
-CREATE TABLE IF NOT EXISTS `#__users` (
+CREATE TABLE IF NOT EXISTS `sfj8s_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `username` varchar(150) NOT NULL DEFAULT '',
@@ -1874,13 +1874,16 @@ CREATE TABLE IF NOT EXISTS `#__users` (
   KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `sfj8s_users` (`id`, `name`, `username`, `email`, `password`, `usertype`, `block`, `sendEmail`, `registerDate`, `lastvisitDate`, `activation`, `params`, `lastResetTime`, `resetCount`) VALUES
+(522, 'Super User', 'admin', 'admin@admin.com', 'c7995e2aa0132c8d6451a05bfcec8f6f:rHHqSZGJa5PnfloV6QGdWdDxjgznMxYC', 'deprecated', 0, 1, '2013-03-05 09:27:03', '2013-03-05 09:27:14', '0', '', '0000-00-00 00:00:00', 0);
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__user_keys`
+-- Table structure for table `sfj8s_user_keys`
 --
 
-CREATE TABLE IF NOT EXISTS `#__user_keys` (
+CREATE TABLE IF NOT EXISTS `sfj8s_user_keys` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
@@ -1898,10 +1901,10 @@ CREATE TABLE IF NOT EXISTS `#__user_keys` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__user_notes`
+-- Table structure for table `sfj8s_user_notes`
 --
 
-CREATE TABLE IF NOT EXISTS `#__user_notes` (
+CREATE TABLE IF NOT EXISTS `sfj8s_user_notes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL DEFAULT 0,
   `catid` int(10) unsigned NOT NULL DEFAULT 0,
@@ -1925,10 +1928,10 @@ CREATE TABLE IF NOT EXISTS `#__user_notes` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__user_profiles`
+-- Table structure for table `sfj8s_user_profiles`
 --
 
-CREATE TABLE IF NOT EXISTS `#__user_profiles` (
+CREATE TABLE IF NOT EXISTS `sfj8s_user_profiles` (
   `user_id` int(11) NOT NULL,
   `profile_key` varchar(100) NOT NULL,
   `profile_value` text NOT NULL,
@@ -1939,22 +1942,22 @@ CREATE TABLE IF NOT EXISTS `#__user_profiles` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__user_usergroup_map`
+-- Table structure for table `sfj8s_user_usergroup_map`
 --
 
-CREATE TABLE IF NOT EXISTS `#__user_usergroup_map` (
-  `user_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Foreign Key to #__users.id',
-  `group_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Foreign Key to #__usergroups.id',
+CREATE TABLE IF NOT EXISTS `sfj8s_user_usergroup_map` (
+  `user_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Foreign Key to sfj8s_users.id',
+  `group_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Foreign Key to sfj8s_usergroups.id',
   PRIMARY KEY (`user_id`,`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `#__viewlevels`
+-- Table structure for table `sfj8s_viewlevels`
 --
 
-CREATE TABLE IF NOT EXISTS `#__viewlevels` (
+CREATE TABLE IF NOT EXISTS `sfj8s_viewlevels` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `title` varchar(100) NOT NULL DEFAULT '',
   `ordering` int(11) NOT NULL DEFAULT 0,
@@ -1964,10 +1967,10 @@ CREATE TABLE IF NOT EXISTS `#__viewlevels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=7;
 
 --
--- Dumping data for table `#__viewlevels`
+-- Dumping data for table `sfj8s_viewlevels`
 --
 
-INSERT INTO `#__viewlevels` (`id`, `title`, `ordering`, `rules`) VALUES
+INSERT INTO `sfj8s_viewlevels` (`id`, `title`, `ordering`, `rules`) VALUES
 (1, 'Public', 0, '[1]'),
 (2, 'Registered', 2, '[6,2,8]'),
 (3, 'Special', 3, '[6,3,8]'),

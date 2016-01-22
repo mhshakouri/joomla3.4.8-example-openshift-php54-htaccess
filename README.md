@@ -1,5 +1,6 @@
-Joomla on OpenShift
-===================
+
+Joomla 3.4.8 on OpenShift with .htaccess support
+================================================
 
 This git repository helps you get up and running quickly w/ a Joomla installation
 on OpenShift.  The backend database is MySQL and the database name is the 
@@ -18,7 +19,7 @@ Create an account at https://www.openshift.com
 
 Create a php application with mysql (you can call your application whatever you want)
 
-    rhc app create joomla php-5.3 mysql-5.1
+    rhc app create joomla php-5.4 mysql-5.5
 
 Add this upstream Joomla repo
 
