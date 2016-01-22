@@ -1893,7 +1893,22 @@ INSERT INTO  `farin_DB`.`sh0zq_users` (
 `requireReset`
 )
 VALUES (
-'0',  'Site Admin',  'admin',  'admin@admin.com',  'c7995e2aa0132c8d6451a05bfcec8f6f:rHHqSZGJa5PnfloV6QGdWdDxjgznMxYC', '0',  '1',  '2014-11-22 08:41:44',  '2016-01-22 12:24:26',  '0', '{"admin_style":"","admin_language":"","language":"","editor":"","helpsite":"","timezone":""}',  '0000-00-00 00:00:00',  '0',  '',  '',  '0'
+'0',
+'Site Admin',
+'admin',
+'admin@admin.com',
+'c7995e2aa0132c8d6451a05bfcec8f6f:rHHqSZGJa5PnfloV6QGdWdDxjgznMxYC',
+'0',
+'1',
+'2014-11-22 08:41:44',
+'2016-01-22 12:24:26',
+'0',
+'{"admin_style":"","admin_language":"","language":"","editor":"","helpsite":"","timezone":""}',
+'0000-00-00 00:00:00',
+'0',
+'',
+'',
+'0'
 );
 
 -- --------------------------------------------------------
