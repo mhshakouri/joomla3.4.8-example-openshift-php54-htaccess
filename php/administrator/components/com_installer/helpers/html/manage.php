@@ -1,26 +1,28 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Administrator
+ * @subpackage  com_installer
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// no direct access
 defined('_JEXEC') or die;
 
 /**
- * @package		Joomla.Administrator
- * @subpackage	com_installer
- * @since		2.5
+ * Installer HTML class.
+ *
+ * @since  2.5
  */
 abstract class InstallerHtmlManage
 {
 	/**
-	 * Returns a published state on a grid
+	 * Returns a published state on a grid.
 	 *
-	 * @param   integer       $value			The state value.
-	 * @param   integer       $i				The row index
-	 * @param   boolean       $enabled			An optional setting for access control on the action.
-	 * @param   string        $checkbox			An optional prefix for checkboxes.
+	 * @param   integer  $value     The state value.
+	 * @param   integer  $i         The row index.
+	 * @param   boolean  $enabled   An optional setting for access control on the action.
+	 * @param   string   $checkbox  An optional prefix for checkboxes.
 	 *
 	 * @return  string        The Html code
 	 *
@@ -30,33 +32,33 @@ abstract class InstallerHtmlManage
 	 */
 	public static function state($value, $i, $enabled = true, $checkbox = 'cb')
 	{
-		$states	= array(
-			2	=> array(
+		$states = array(
+			2 => array(
 				'',
 				'COM_INSTALLER_EXTENSION_PROTECTED',
 				'',
 				'COM_INSTALLER_EXTENSION_PROTECTED',
-				false,
+				true,
 				'protected',
-				'protected'
+				'protected',
 			),
-			1	=> array(
+			1 => array(
 				'unpublish',
 				'COM_INSTALLER_EXTENSION_ENABLED',
 				'COM_INSTALLER_EXTENSION_DISABLE',
 				'COM_INSTALLER_EXTENSION_ENABLED',
-				false,
+				true,
 				'publish',
-				'publish'
+				'publish',
 			),
-			0	=> array(
+			0 => array(
 				'publish',
 				'COM_INSTALLER_EXTENSION_DISABLED',
 				'COM_INSTALLER_EXTENSION_ENABLE',
 				'COM_INSTALLER_EXTENSION_DISABLED',
-				false,
+				true,
 				'unpublish',
-				'unpublish'
+				'unpublish',
 			),
 		);
 

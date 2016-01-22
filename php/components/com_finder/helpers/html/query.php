@@ -3,8 +3,8 @@
  * @package     Joomla.Site
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -12,9 +12,7 @@ defined('_JEXEC') or die;
 /**
  * Query HTML behavior class for Finder.
  *
- * @package     Joomla.Site
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 abstract class JHtmlQuery
 {
@@ -62,14 +60,16 @@ abstract class JHtmlQuery
 		if ($query->date1)
 		{
 			$date = JFactory::getDate($query->date1)->format(JText::_('DATE_FORMAT_LC'));
-			$parts[] = '<span class="query-start-date">' . JText::sprintf('COM_FINDER_QUERY_START_DATE', $query->when1, $date) . '</span>';
+			$datecondition = JText::_('COM_FINDER_QUERY_DATE_CONDITION_' . strtoupper($query->when1));
+			$parts[] = '<span class="query-start-date">' . JText::sprintf('COM_FINDER_QUERY_START_DATE', $datecondition, $date) . '</span>';
 		}
 
 		// Process the end date.
 		if ($query->date2)
 		{
 			$date = JFactory::getDate($query->date2)->format(JText::_('DATE_FORMAT_LC'));
-			$parts[] = '<span class="query-end-date">' . JText::sprintf('COM_FINDER_QUERY_END_DATE', $query->when2, $date) . '</span>';
+			$datecondition = JText::_('COM_FINDER_QUERY_DATE_CONDITION_' . strtoupper($query->when2));
+			$parts[] = '<span class="query-end-date">' . JText::sprintf('COM_FINDER_QUERY_END_DATE', $datecondition, $date) . '</span>';
 		}
 
 		// Process the taxonomy filters.
@@ -87,7 +87,8 @@ abstract class JHtmlQuery
 				{
 					// Translate the title for Types
 					$key = FinderHelperLanguage::branchPlural($title);
-					if ($lang->hasKey($key)) {
+					if ($lang->hasKey($key))
+					{
 						$title = JText::_($key);
 					}
 
@@ -98,9 +99,9 @@ abstract class JHtmlQuery
 					}
 
 					// Add the node to the explanation.
-					$bv = JString::strtolower($branch);
-					$nv = JString::strtolower($title);
-					$parts[] = '<span class="query-taxonomy">' . JText::sprintf('COM_FINDER_QUERY_TAXONOMY_NODE', $title, JText::_(FinderHelperLanguage::branchSingular($branch))) . '</span>';
+					$parts[] = '<span class="query-taxonomy">'
+						. JText::sprintf('COM_FINDER_QUERY_TAXONOMY_NODE', $title, JText::_(FinderHelperLanguage::branchSingular($branch)))
+						. '</span>';
 				}
 			}
 		}
@@ -138,7 +139,7 @@ abstract class JHtmlQuery
 			{
 				if (isset($token->suggestion))
 				{
-					$suggested = str_replace($token->term, $token->suggestion, $suggested);
+					$suggested = str_ireplace($token->term, $token->suggestion, $suggested);
 				}
 			}
 
@@ -147,7 +148,7 @@ abstract class JHtmlQuery
 			{
 				if (isset($token->suggestion))
 				{
-					$suggested = str_replace($token->term, $token->suggestion, $suggested);
+					$suggested = str_ireplace($token->term, $token->suggestion, $suggested);
 				}
 			}
 

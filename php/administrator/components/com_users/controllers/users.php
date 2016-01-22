@@ -3,21 +3,16 @@
  * @package     Joomla.Administrator
  * @subpackage  com_users
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access.
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.controlleradmin');
 
 /**
  * Users list controller class.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_users
- * @since       1.6
+ * @since  1.6
  */
 class UsersControllerUsers extends JControllerAdmin
 {
@@ -32,8 +27,6 @@ class UsersControllerUsers extends JControllerAdmin
 	 *
 	 * @param   array  $config  An optional associative array of configuration settings.
 	 *
-	 * @return  UsersControllerUsers
-	 *
 	 * @since   1.6
 	 * @see     JController
 	 */
@@ -41,8 +34,8 @@ class UsersControllerUsers extends JControllerAdmin
 	{
 		parent::__construct($config);
 
-		$this->registerTask('block',		'changeBlock');
-		$this->registerTask('unblock',		'changeBlock');
+		$this->registerTask('block', 'changeBlock');
+		$this->registerTask('unblock', 'changeBlock');
 	}
 
 	/**
@@ -54,7 +47,7 @@ class UsersControllerUsers extends JControllerAdmin
 	 *
 	 * @return  object  The model.
 	 *
-	 * @since	1.6
+	 * @since   1.6
 	 */
 	public function getModel($name = 'User', $prefix = 'UsersModel', $config = array('ignore_request' => true))
 	{
@@ -73,11 +66,10 @@ class UsersControllerUsers extends JControllerAdmin
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		// Initialise variables.
-		$ids	= JRequest::getVar('cid', array(), '', 'array');
-		$values	= array('block' => 1, 'unblock' => 0);
-		$task	= $this->getTask();
-		$value	= JArrayHelper::getValue($values, $task, 0, 'int');
+		$ids    = $this->input->get('cid', array(), 'array');
+		$values = array('block' => 1, 'unblock' => 0);
+		$task   = $this->getTask();
+		$value  = JArrayHelper::getValue($values, $task, 0, 'int');
 
 		if (empty($ids))
 		{
@@ -121,8 +113,7 @@ class UsersControllerUsers extends JControllerAdmin
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		// Initialise variables.
-		$ids	= JRequest::getVar('cid', array(), '', 'array');
+		$ids = $this->input->get('cid', array(), 'array');
 
 		if (empty($ids))
 		{

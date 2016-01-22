@@ -3,8 +3,8 @@
  * @package     Joomla.Administrator
  * @subpackage  com_users
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -12,16 +12,14 @@ defined('_JEXEC') or die;
 /**
  * Extended Utility class for the Users component.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_users
- * @since       2.5
+ * @since  2.5
  */
 class JHtmlUsers
 {
 	/**
 	 * Display an image.
 	 *
-	 * @param   string	$src  The source of the image
+	 * @param   string  $src  The source of the image
 	 *
 	 * @return  string  A <img> element if the specified file exists, otherwise, a null string
 	 *
@@ -56,8 +54,8 @@ class JHtmlUsers
 	{
 		$title = JText::_('COM_USERS_ADD_NOTE');
 
-		return '<a href="' . JRoute::_('index.php?option=com_users&task=note.add&u_id=' . (int) $userId) . '">'
-				. JHtml::_('image', 'admin/note_add_16.png', 'COM_USERS_NOTES', array('title' => $title), true) . '</a>';
+		return '<a href="' . JRoute::_('index.php?option=com_users&task=note.add&u_id=' . (int) $userId) . '" class="hasTooltip btn btn-mini" title="'
+			. $title . '"><span class="icon-vcard"></span><span class="hidden-phone">' . $title . '</span></a>';
 	}
 
 	/**
@@ -66,7 +64,7 @@ class JHtmlUsers
 	 * @param   integer  $count   The number of notes for the user
 	 * @param   integer  $userId  The user ID
 	 *
-	 * @return	string  A link to apply a filter
+	 * @return  string  A link to apply a filter
 	 *
 	 * @since   2.5
 	 */
@@ -79,8 +77,8 @@ class JHtmlUsers
 
 		$title = JText::_('COM_USERS_FILTER_NOTES');
 
-		return '<a href="' . JRoute::_('index.php?option=com_users&view=notes&filter_search=uid:' . (int) $userId) . '">'
-				. JHtml::_('image', 'admin/filter_16.png', 'COM_USERS_NOTES', array('title' => $title), true) . '</a>';
+		return '<a href="' . JRoute::_('index.php?option=com_users&view=notes&filter_search=uid:' . (int) $userId)
+			. '" class="hasTooltip btn btn-mini" title="' . $title . '"><span class="icon-filter"></span></a>';
 	}
 
 	/**
@@ -89,7 +87,7 @@ class JHtmlUsers
 	 * @param   integer  $count   The number of notes for the user
 	 * @param   integer  $userId  The user ID
 	 *
-	 * @return	string  A link to a modal window with the user notes
+	 * @return  string  A link to a modal window with the user notes
 	 *
 	 * @since   2.5
 	 */
@@ -102,9 +100,141 @@ class JHtmlUsers
 
 		$title = JText::plural('COM_USERS_N_USER_NOTES', $count);
 
-		return '<a class="modal"' .
-			' href="' . JRoute::_('index.php?option=com_users&view=notes&tmpl=component&layout=modal&u_id=' . (int) $userId) . '"' .
-			' rel="{handler: \'iframe\', size: {x: 800, y: 450}}">' .
-			JHtml::_('image', 'menu/icon-16-user-note.png', 'COM_USERS_NOTES', array('title' => $title), true) . '</a>';
+		return '<a href="#userModal_' . (int) $userId . '" id="modal-' . (int) $userId . '" data-toggle="modal" class="hasTooltip btn btn-mini" title="'
+			. $title . '"><span class="icon-drawer-2"></span><span class="hidden-phone">' . $title . '</span></a>';
+	}
+
+	/**
+	 * Renders the modal html.
+	 *
+	 * @param   integer  $count   The number of notes for the user
+	 * @param   integer  $userId  The user ID
+	 *
+	 * @return  string   The html for the rendered modal
+	 *
+	 * @since   3.4.1
+	*/
+	public static function notesModal($count, $userId)
+	{
+		if (empty($count))
+		{
+			return '';
+		}
+
+		$title = JText::plural('COM_USERS_N_USER_NOTES', $count);
+		$footer = '<button class="btn" data-dismiss="modal" aria-hidden="true">'
+			. JText::_('JTOOLBAR_CLOSE') . '</a>';
+
+		return JHtml::_(
+			'bootstrap.renderModal',
+			'userModal_' . (int) $userId,
+			array(
+				'title' => $title,
+				'backdrop' => 'static',
+				'keyboard' => true,
+				'closeButton' => true,
+				'footer' => $footer,
+				'url' => JRoute::_('index.php?option=com_users&view=notes&tmpl=component&layout=modal&u_id=' . (int) $userId),
+				'height' => '300px',
+				'width' => '800px'
+			)
+		);
+
+	}
+
+	/**
+	 * Build an array of block/unblock user states to be used by jgrid.state,
+	 * State options will be different for any user
+	 * and for currently logged in user
+	 *
+	 * @param   boolean  $self  True if state array is for currently logged in user
+	 *
+	 * @return  array  a list of possible states to display
+	 *
+	 * @since  3.0
+	 */
+	public static function blockStates( $self = false)
+	{
+		if ($self)
+		{
+			$states = array(
+				1 => array(
+					'task'           => 'unblock',
+					'text'           => '',
+					'active_title'   => 'COM_USERS_USER_FIELD_BLOCK_DESC',
+					'inactive_title' => '',
+					'tip'            => true,
+					'active_class'   => 'unpublish',
+					'inactive_class' => 'unpublish',
+				),
+				0 => array(
+					'task'           => 'block',
+					'text'           => '',
+					'active_title'   => '',
+					'inactive_title' => 'COM_USERS_USERS_ERROR_CANNOT_BLOCK_SELF',
+					'tip'            => true,
+					'active_class'   => 'publish',
+					'inactive_class' => 'publish',
+				)
+			);
+		}
+		else
+		{
+			$states = array(
+				1 => array(
+					'task'           => 'unblock',
+					'text'           => '',
+					'active_title'   => 'COM_USERS_TOOLBAR_UNBLOCK',
+					'inactive_title' => '',
+					'tip'            => true,
+					'active_class'   => 'unpublish',
+					'inactive_class' => 'unpublish',
+				),
+				0 => array(
+					'task'           => 'block',
+					'text'           => '',
+					'active_title'   => 'COM_USERS_USER_FIELD_BLOCK_DESC',
+					'inactive_title' => '',
+					'tip'            => true,
+					'active_class'   => 'publish',
+					'inactive_class' => 'publish',
+				)
+			);
+		}
+
+		return $states;
+	}
+
+	/**
+	 * Build an array of activate states to be used by jgrid.state,
+	 *
+	 * @return  array  a list of possible states to display
+	 *
+	 * @since  3.0
+	 */
+	public static function activateStates()
+	{
+		$states = array(
+			1 => array(
+				'task'           => 'activate',
+				'text'           => '',
+				'active_title'   => 'COM_USERS_TOOLBAR_ACTIVATE',
+				'inactive_title' => '',
+				'tip'            => true,
+				'active_class'   => 'unpublish',
+				'inactive_class' => 'unpublish',
+			),
+			0 => array(
+				'task'           => '',
+				'text'           => '',
+				'active_title'   => '',
+				'inactive_title' => 'COM_USERS_ACTIVATED',
+				'tip'            => true,
+				'active_class'   => 'publish',
+				'inactive_class' => 'publish',
+			)
+		);
+
+		return $states;
 	}
 }

@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Form
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -16,10 +16,8 @@ JFormHelper::loadFieldClass('list');
  * Provides a list of available database connections, optionally limiting to
  * a given list.
  *
- * @package     Joomla.Platform
- * @subpackage  Form
- * @see         JDatabase
- * @since       11.3
+ * @see    JDatabaseDriver
+ * @since  11.3
  */
 class JFormFieldDatabaseConnection extends JFormFieldList
 {
@@ -29,24 +27,23 @@ class JFormFieldDatabaseConnection extends JFormFieldList
 	 * @var    string
 	 * @since  11.3
 	 */
-	public $type = 'DatabaseConnection';
+	protected $type = 'DatabaseConnection';
 
 	/**
 	 * Method to get the list of database options.
 	 *
 	 * This method produces a drop down list of available databases supported
-	 * by JDatabase drivers that are also supported by the application.
+	 * by JDatabaseDriver classes that are also supported by the application.
 	 *
-	 * @return  array    The field option objects.
+	 * @return  array  The field option objects.
 	 *
 	 * @since   11.3
-	 * @see		JDatabase
+	 * @see     JDatabaseDriver::getConnectors()
 	 */
 	protected function getOptions()
 	{
-		// Initialize variables.
 		// This gets the connectors available in the platform and supported by the server.
-		$available = JDatabase::getConnectors();
+		$available = JDatabaseDriver::getConnectors();
 
 		/**
 		 * This gets the list of database types supported by the application.
@@ -55,14 +52,16 @@ class JFormFieldDatabaseConnection extends JFormFieldList
 		 * are supported.
 		 */
 		$supported = $this->element['supported'];
+
 		if (!empty($supported))
 		{
 			$supported = explode(',', $supported);
+
 			foreach ($supported as $support)
 			{
 				if (in_array($support, $available))
 				{
-					$options[$support] = ucfirst($support);
+					$options[$support] = JText::_(ucfirst($support));
 				}
 			}
 		}
@@ -70,7 +69,7 @@ class JFormFieldDatabaseConnection extends JFormFieldList
 		{
 			foreach ($available as $support)
 			{
-				$options[$support] = ucfirst($support);
+				$options[$support] = JText::_(ucfirst($support));
 			}
 		}
 
@@ -80,6 +79,7 @@ class JFormFieldDatabaseConnection extends JFormFieldList
 		{
 			$options[''] = JText::_('JNONE');
 		}
+
 		return $options;
 	}
 }

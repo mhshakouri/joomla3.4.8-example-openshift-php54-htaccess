@@ -1,32 +1,27 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- *
  * @package     Joomla.Administrator
  * @subpackage  com_menus
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// no direct access
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.modellist');
 
 /**
  * Menu List Model for Menus.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_menus
- * @since       1.6
+ * @since  1.6
  */
 class MenusModelMenus extends JModelList
 {
 	/**
 	 * Constructor.
 	 *
-	 * @param   array	An optional associative array of configuration settings.
+	 * @param   array  $config  An optional associative array of configuration settings.
 	 *
-	 * @see		JController
+	 * @see     JController
 	 * @since   1.6
 	 */
 	public function __construct($config = array())
@@ -88,41 +83,53 @@ class MenusModelMenus extends JModelList
 			->select('m.menutype, COUNT(DISTINCT m.id) AS count_published')
 			->from('#__menu AS m')
 			->where('m.published = 1')
-			->where('m.menutype IN ('.$menuTypes.')')
-			->group('m.menutype')
-			;
-		$db->setQuery($query);
-		$countPublished = $db->loadAssocList('menutype', 'count_published');
+			->where('m.menutype IN (' . $menuTypes . ')')
+			->group('m.menutype');
 
-		if ($db->getErrorNum())
+		$db->setQuery($query);
+
+		try
 		{
-			$this->setError($db->getErrorMsg());
+			$countPublished = $db->loadAssocList('menutype', 'count_published');
+		}
+		catch (RuntimeException $e)
+		{
+			$this->setError($e->getMessage());
+
 			return false;
 		}
 
 		// Get the unpublished menu counts.
 		$query->clear('where')
 			->where('m.published = 0')
-			->where('m.menutype IN ('.$menuTypes.')');
+			->where('m.menutype IN (' . $menuTypes . ')');
 		$db->setQuery($query);
-		$countUnpublished = $db->loadAssocList('menutype', 'count_published');
 
-		if ($db->getErrorNum())
+		try
 		{
-			$this->setError($db->getErrorMsg());
+			$countUnpublished = $db->loadAssocList('menutype', 'count_published');
+		}
+		catch (RuntimeException $e)
+		{
+			$this->setError($e->getMessage());
+
 			return false;
 		}
 
 		// Get the trashed menu counts.
 		$query->clear('where')
 			->where('m.published = -2')
-			->where('m.menutype IN ('.$menuTypes.')');
+			->where('m.menutype IN (' . $menuTypes . ')');
 		$db->setQuery($query);
-		$countTrashed = $db->loadAssocList('menutype', 'count_published');
 
-		if ($db->getErrorNum())
+		try
 		{
-			$this->setError($db->getErrorMsg());
+			$countTrashed = $db->loadAssocList('menutype', 'count_published');
+		}
+		catch (RuntimeException $e)
+		{
+			$this->setError($e->getMessage());
+
 			return false;
 		}
 
@@ -154,14 +161,19 @@ class MenusModelMenus extends JModelList
 		$query = $db->getQuery(true);
 
 		// Select all fields from the table.
-		$query->select($this->getState('list.select', 'a.*'));
-		$query->from($db->quoteName('#__menu_types').' AS a');
+		$query->select($this->getState('list.select', 'a.id, a.menutype, a.title, a.description'))
+			->from($db->quoteName('#__menu_types') . ' AS a')
+			->where('a.id > 0');
 
-
-		$query->group('a.id, a.menutype, a.title, a.description');
+		// Filter by search in title or menutype
+		if ($search = trim($this->getState('filter.search')))
+		{
+			$search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
+			$query->where('(' . 'a.title LIKE ' . $search . ' OR a.menutype LIKE ' . $search . ')');
+		}
 
 		// Add the list ordering clause.
-		$query->order($db->escape($this->getState('list.ordering', 'a.id')).' '.$db->escape($this->getState('list.direction', 'ASC')));
+		$query->order($db->escape($this->getState('list.ordering', 'a.id')) . ' ' . $db->escape($this->getState('list.direction', 'ASC')));
 
 		return $query;
 	}
@@ -180,11 +192,11 @@ class MenusModelMenus extends JModelList
 	 */
 	protected function populateState($ordering = null, $direction = null)
 	{
-		// Initialise variables.
-		$app = JFactory::getApplication('administrator');
+		$search = $this->getUserStateFromRequest($this->context . '.search', 'filter_search');
+		$this->setState('filter.search', $search);
 
 		// List state information.
-		parent::populateState('a.id', 'asc');
+		parent::populateState('a.title', 'asc');
 	}
 
 	/**
@@ -197,9 +209,8 @@ class MenusModelMenus extends JModelList
 	public function getModMenuId()
 	{
 		$db = $this->getDbo();
-		$query = $db->getQuery(true);
-
-		$query->select('e.extension_id')
+		$query = $db->getQuery(true)
+			->select('e.extension_id')
 			->from('#__extensions AS e')
 			->where('e.type = ' . $db->quote('module'))
 			->where('e.element = ' . $db->quote('mod_menu'))
@@ -213,11 +224,13 @@ class MenusModelMenus extends JModelList
 	 * Gets a list of all mod_mainmenu modules and collates them by menutype
 	 *
 	 * @return  array
+	 *
+	 * @since   1.6
 	 */
 	public function &getModules()
 	{
-		$model	= JModelLegacy::getInstance('Menu', 'MenusModel', array('ignore_request' => true));
-		$result	= &$model->getModules();
+		$model = JModelLegacy::getInstance('Menu', 'MenusModel', array('ignore_request' => true));
+		$result = $model->getModules();
 
 		return $result;
 	}

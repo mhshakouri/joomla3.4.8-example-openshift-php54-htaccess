@@ -3,7 +3,7 @@
  * @package     Joomla.Administrator
  * @subpackage  com_banners
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
@@ -12,15 +12,16 @@ defined('_JEXEC') or die;
 /**
  * View class for a list of banners.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_banners
- * @since       1.6
+ * @since  1.6
  */
 class BannersViewBanners extends JViewLegacy
 {
 	protected $categories;
+
 	protected $items;
+
 	protected $pagination;
+
 	protected $state;
 
 	/**
@@ -34,24 +35,30 @@ class BannersViewBanners extends JViewLegacy
 	 */
 	public function display($tpl = null)
 	{
-		// Initialise variables.
-		$this->categories	= $this->get('CategoryOrders');
-		$this->items		= $this->get('Items');
-		$this->pagination	= $this->get('Pagination');
-		$this->state		= $this->get('State');
+		$this->categories    = $this->get('CategoryOrders');
+		$this->items         = $this->get('Items');
+		$this->pagination    = $this->get('Pagination');
+		$this->state         = $this->get('State');
+		$this->filterForm    = $this->get('FilterForm');
+		$this->activeFilters = $this->get('ActiveFilters');
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode("\n", $errors));
+
 			return false;
 		}
 
+		BannersHelper::addSubmenu('banners');
+
 		$this->addToolbar();
 		require_once JPATH_COMPONENT . '/models/fields/bannerclient.php';
+
 		// Include the component HTML helpers.
 		JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
+		$this->sidebar = JHtmlSidebar::render();
 		parent::display($tpl);
 	}
 
@@ -66,63 +73,100 @@ class BannersViewBanners extends JViewLegacy
 	{
 		require_once JPATH_COMPONENT . '/helpers/banners.php';
 
-		$canDo = BannersHelper::getActions($this->state->get('filter.category_id'));
+		$canDo = JHelperContent::getActions('com_banners', 'category', $this->state->get('filter.category_id'));
 		$user = JFactory::getUser();
-		JToolBarHelper::title(JText::_('COM_BANNERS_MANAGER_BANNERS'), 'banners.png');
+
+		// Get the toolbar object instance
+		$bar = JToolBar::getInstance('toolbar');
+
+		JToolbarHelper::title(JText::_('COM_BANNERS_MANAGER_BANNERS'), 'bookmark banners');
+
 		if (count($user->getAuthorisedCategories('com_banners', 'core.create')) > 0)
 		{
-			JToolBarHelper::addNew('banner.add');
+			JToolbarHelper::addNew('banner.add');
 		}
 
 		if (($canDo->get('core.edit')))
 		{
-			JToolBarHelper::editList('banner.edit');
+			JToolbarHelper::editList('banner.edit');
 		}
 
 		if ($canDo->get('core.edit.state'))
 		{
 			if ($this->state->get('filter.state') != 2)
 			{
-				JToolBarHelper::divider();
-				JToolBarHelper::publish('banners.publish', 'JTOOLBAR_PUBLISH', true);
-				JToolBarHelper::unpublish('banners.unpublish', 'JTOOLBAR_UNPUBLISH', true);
+				JToolbarHelper::publish('banners.publish', 'JTOOLBAR_PUBLISH', true);
+				JToolbarHelper::unpublish('banners.unpublish', 'JTOOLBAR_UNPUBLISH', true);
 			}
 
 			if ($this->state->get('filter.state') != -1)
 			{
-				JToolBarHelper::divider();
 				if ($this->state->get('filter.state') != 2)
 				{
-					JToolBarHelper::archiveList('banners.archive');
+					JToolbarHelper::archiveList('banners.archive');
 				}
 				elseif ($this->state->get('filter.state') == 2)
 				{
-					JToolBarHelper::unarchiveList('banners.publish');
+					JToolbarHelper::unarchiveList('banners.publish');
 				}
 			}
 		}
 
 		if ($canDo->get('core.edit.state'))
 		{
-			JToolBarHelper::checkin('banners.checkin');
+			JToolbarHelper::checkin('banners.checkin');
+		}
+
+		// Add a batch button
+		if ($user->authorise('core.create', 'com_banners')
+			&& $user->authorise('core.edit', 'com_banners')
+			&& $user->authorise('core.edit.state', 'com_banners'))
+		{
+			$title = JText::_('JTOOLBAR_BATCH');
+
+			// Instantiate a new JLayoutFile instance and render the batch button
+			$layout = new JLayoutFile('joomla.toolbar.batch');
+
+			$dhtml = $layout->render(array('title' => $title));
+			$bar->appendButton('Custom', $dhtml, 'batch');
 		}
 
 		if ($this->state->get('filter.state') == -2 && $canDo->get('core.delete'))
 		{
-			JToolBarHelper::deleteList('', 'banners.delete', 'JTOOLBAR_EMPTY_TRASH');
-			JToolBarHelper::divider();
+			JToolbarHelper::deleteList('', 'banners.delete', 'JTOOLBAR_EMPTY_TRASH');
 		}
 		elseif ($canDo->get('core.edit.state'))
 		{
-			JToolBarHelper::trash('banners.trash');
-			JToolBarHelper::divider();
+			JToolbarHelper::trash('banners.trash');
 		}
 
-		if ($canDo->get('core.admin'))
+		if ($user->authorise('core.admin', 'com_banners') || $user->authorise('core.options', 'com_banners'))
 		{
-			JToolBarHelper::preferences('com_banners');
-			JToolBarHelper::divider();
+			JToolbarHelper::preferences('com_banners');
 		}
-		JToolBarHelper::help('JHELP_COMPONENTS_BANNERS_BANNERS');
+
+		JToolbarHelper::help('JHELP_COMPONENTS_BANNERS_BANNERS');
+	}
+
+	/**
+	 * Returns an array of fields the table can be sorted by
+	 *
+	 * @return  array  Array containing the field name to sort by as the key and display text as value
+	 *
+	 * @since   3.0
+	 */
+	protected function getSortFields()
+	{
+		return array(
+			'ordering' => JText::_('JGRID_HEADING_ORDERING'),
+			'a.state' => JText::_('JSTATUS'),
+			'a.name' => JText::_('COM_BANNERS_HEADING_NAME'),
+			'a.sticky' => JText::_('COM_BANNERS_HEADING_STICKY'),
+			'client_name' => JText::_('COM_BANNERS_HEADING_CLIENT'),
+			'impmade' => JText::_('COM_BANNERS_HEADING_IMPRESSIONS'),
+			'clicks' => JText::_('COM_BANNERS_HEADING_CLICKS'),
+			'a.language' => JText::_('JGRID_HEADING_LANGUAGE'),
+			'a.id' => JText::_('JGRID_HEADING_ID')
+		);
 	}
 }

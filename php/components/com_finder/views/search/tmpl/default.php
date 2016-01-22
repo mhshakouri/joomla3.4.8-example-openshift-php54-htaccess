@@ -3,13 +3,13 @@
  * @package     Joomla.Site
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
 
-JHtml::_('behavior.framework');
+JHtml::_('behavior.core');
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 JHtml::stylesheet('com_finder/finder.css', false, true, false);
 ?>
@@ -25,7 +25,7 @@ JHtml::stylesheet('com_finder/finder.css', false, true, false);
 </h1>
 <?php endif; ?>
 
-<?php if ($this->params->get('show_search_form', 1)): ?>
+<?php if ($this->params->get('show_search_form', 1)) : ?>
 	<div id="search-form">
 		<?php echo $this->loadTemplate('form'); ?>
 	</div>

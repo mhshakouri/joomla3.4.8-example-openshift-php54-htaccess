@@ -1,7 +1,10 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Administrator
+ * @subpackage  com_media
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -9,25 +12,32 @@ defined('_JEXEC') or die;
 /**
  * HTML View class for the Media component
  *
- * @package		Joomla.Administrator
- * @subpackage	com_media
- * @since 1.0
+ * @since  1.0
  */
 class MediaViewImagesList extends JViewLegacy
 {
-	function display($tpl = null)
+	/**
+	 * Execute and display a template script.
+	 *
+	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
+	 *
+	 * @return  mixed  A string if successful, otherwise a Error object.
+	 *
+	 * @since   1.0
+	 */
+	public function display($tpl = null)
 	{
 		// Do not allow cache
-		JResponse::allowCache(false);
+		JFactory::getApplication()->allowCache(false);
 
-		$app = JFactory::getApplication();
-
-		$lang	= JFactory::getLanguage();
+		$lang = JFactory::getLanguage();
 
 		JHtml::_('stylesheet', 'media/popup-imagelist.css', array(), true);
-		if ($lang->isRTL()) :
+
+		if ($lang->isRtl())
+		{
 			JHtml::_('stylesheet', 'media/popup-imagelist_rtl.css', array(), true);
-		endif;
+		}
 
 		$document = JFactory::getDocument();
 		$document->addScriptDeclaration("var ImageManager = window.parent.ImageManager;");
@@ -37,28 +47,51 @@ class MediaViewImagesList extends JViewLegacy
 		$state = $this->get('state');
 
 		$this->baseURL = COM_MEDIA_BASEURL;
-		$this->assignRef('images', $images);
-		$this->assignRef('folders', $folders);
-		$this->assignRef('state', $state);
+		$this->images = &$images;
+		$this->folders = &$folders;
+		$this->state = &$state;
 
 		parent::display($tpl);
 	}
 
-
-	function setFolder($index = 0)
+	/**
+	 * Set the active folder
+	 *
+	 * @param   integer  $index  Folder position
+	 *
+	 * @return  void
+	 *
+	 * @since   1.0
+	 */
+	public function setFolder($index = 0)
 	{
-		if (isset($this->folders[$index])) {
+		if (isset($this->folders[$index]))
+		{
 			$this->_tmp_folder = &$this->folders[$index];
-		} else {
+		}
+		else
+		{
 			$this->_tmp_folder = new JObject;
 		}
 	}
 
-	function setImage($index = 0)
+	/**
+	 * Set the active image
+	 *
+	 * @param   integer  $index  Image position
+	 *
+	 * @return  void
+	 *
+	 * @since   1.0
+	 */
+	public function setImage($index = 0)
 	{
-		if (isset($this->images[$index])) {
+		if (isset($this->images[$index]))
+		{
 			$this->_tmp_img = &$this->images[$index];
-		} else {
+		}
+		else
+		{
 			$this->_tmp_img = new JObject;
 		}
 	}

@@ -3,7 +3,7 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -15,9 +15,7 @@ JLoader::register('FinderIndexer', JPATH_COMPONENT_ADMINISTRATOR . '/helpers/ind
 /**
  * Indexer controller class for Finder.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderControllerIndexer extends JControllerLegacy
 {
@@ -72,7 +70,7 @@ class FinderControllerIndexer extends JControllerLegacy
 		try
 		{
 			// Trigger the onStartIndex event.
-			JDispatcher::getInstance()->trigger('onStartIndex');
+			JEventDispatcher::getInstance()->trigger('onStartIndex');
 
 			// Get the indexer state.
 			$state = FinderIndexer::getState();
@@ -145,16 +143,16 @@ class FinderControllerIndexer extends JControllerLegacy
 		 * in order to work around some plugins that don't do proper environment
 		 * checks before trying to use HTML document functions.
 		 */
-		$raw = clone(JFactory::getDocument());
+		$raw = clone JFactory::getDocument();
 		$lang = JFactory::getLanguage();
 
 		// Get the document properties.
 		$attributes = array (
-			'charset'	=> 'utf-8',
-			'lineend'	=> 'unix',
-			'tab'		=> '  ',
-			'language'	=> $lang->getTag(),
-			'direction'	=> $lang->isRTL() ? 'rtl' : 'ltr'
+			'charset'   => 'utf-8',
+			'lineend'   => 'unix',
+			'tab'       => '  ',
+			'language'  => $lang->getTag(),
+			'direction' => $lang->isRtl() ? 'rtl' : 'ltr'
 		);
 
 		// Get the HTML document.
@@ -165,10 +163,9 @@ class FinderControllerIndexer extends JControllerLegacy
 		$doc = $html;
 
 		// Get the admin application.
-		$admin = clone(JFactory::getApplication());
+		$admin = clone JFactory::getApplication();
 
 		// Get the site app.
-		include_once JPATH_SITE . '/includes/application.php';
 		$site = JApplication::getInstance('site');
 
 		// Swap the app.
@@ -179,10 +176,10 @@ class FinderControllerIndexer extends JControllerLegacy
 		try
 		{
 			// Trigger the onBeforeIndex event.
-			JDispatcher::getInstance()->trigger('onBeforeIndex');
+			JEventDispatcher::getInstance()->trigger('onBeforeIndex');
 
 			// Trigger the onBuildIndex event.
-			JDispatcher::getInstance()->trigger('onBuildIndex');
+			JEventDispatcher::getInstance()->trigger('onBuildIndex');
 
 			// Get the indexer state.
 			$state = FinderIndexer::getState();
@@ -234,8 +231,8 @@ class FinderControllerIndexer extends JControllerLegacy
 
 		try
 		{
-			// Optimize the index.
-			FinderIndexer::optimize();
+			// Optimize the index
+			FinderIndexer::getInstance()->optimize();
 
 			// Get the indexer state.
 			$state = FinderIndexer::getState();
@@ -279,14 +276,13 @@ class FinderControllerIndexer extends JControllerLegacy
 			}
 		}
 
-		$backtrace = null;
-
 		// Send the assigned error code if we are catching an exception.
 		if ($data instanceof Exception)
 		{
+			$app = JFactory::getApplication();
 			JLog::add($data->getMessage(), JLog::ERROR);
-			JResponse::setHeader('status', $data->getCode());
-			JResponse::sendHeaders();
+			$app->setHeader('status', $data->getCode());
+			$app->sendHeaders();
 		}
 
 		// Create the response object.
@@ -306,9 +302,7 @@ class FinderControllerIndexer extends JControllerLegacy
 /**
  * Finder Indexer JSON Response Class
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderIndexerResponse
 {
@@ -357,7 +351,7 @@ class FinderIndexerResponse
 			$this->totalItems = (int) $state->totalItems;
 
 			$this->startTime = $state->startTime;
-			$this->endTime = JFactory::getDate()->toSQL();
+			$this->endTime = JFactory::getDate()->toSql();
 
 			$this->start = !empty($state->start) ? (int) $state->start : 0;
 			$this->complete = !empty($state->complete) ? (int) $state->complete : 0;

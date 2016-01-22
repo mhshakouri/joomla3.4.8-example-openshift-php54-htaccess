@@ -3,20 +3,16 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.modeladmin');
-
 /**
  * Filter model class for Finder.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderModelFilter extends JModelAdmin
 {
@@ -72,6 +68,7 @@ class FinderModelFilter extends JModelAdmin
 		if ($return === false && $filter->getError())
 		{
 			$this->setError($filter->getError());
+
 			return false;
 		}
 
@@ -89,6 +86,7 @@ class FinderModelFilter extends JModelAdmin
 		if ($this->_db->getErrorNum())
 		{
 			$this->setError($this->_db->getErrorMsg());
+
 			return false;
 		}
 
@@ -103,7 +101,7 @@ class FinderModelFilter extends JModelAdmin
 	 *
 	 * @return  mixed  A JForm object on success, false on failure
 	 *
-	 * @since   1.6
+	 * @since   2.5
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
@@ -150,6 +148,9 @@ class FinderModelFilter extends JModelAdmin
 		{
 			$data = $this->getItem();
 		}
+
+		$this->preprocessData('com_finder.filter', $data);
+
 		return $data;
 	}
 }

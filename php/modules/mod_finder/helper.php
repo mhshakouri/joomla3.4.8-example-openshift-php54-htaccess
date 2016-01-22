@@ -3,8 +3,8 @@
  * @package     Joomla.Site
  * @subpackage  mod_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -22,38 +22,42 @@ class ModFinderHelper
 	 * Method to get hidden input fields for a get form so that control variables
 	 * are not lost upon form submission.
 	 *
-	 * @param   string  $route  The route to the page. [optional]
+	 * @param   string   $route      The route to the page. [optional]
+	 * @param   integer  $paramItem  The menu item ID. (@since 3.1) [optional]
 	 *
 	 * @return  string  A string of hidden input form fields
 	 *
 	 * @since   2.5
 	 */
-	public static function getGetFields($route = null)
+	public static function getGetFields($route = null, $paramItem = 0)
 	{
-		$fields = null;
-		$uri = JURI::getInstance(JRoute::_($route));
+		// Determine if there is an item id before routing.
+		$needId = !JUri::getInstance($route)->getVar('Itemid');
+
+		$fields = array();
+		$uri = JUri::getInstance(JRoute::_($route));
 		$uri->delVar('q');
 
 		// Create hidden input elements for each part of the URI.
-		// Add the current menu id if it doesn't have one
-		$needId = true;
 		foreach ($uri->getQuery(true) as $n => $v)
 		{
-			$fields .= '<input type="hidden" name="' . $n . '" value="' . $v . '" />';
-			if ($n == 'Itemid') {
-				$needId = false;
-			}
+			$fields[] = '<input type="hidden" name="' . $n . '" value="' . $v . '" />';
 		}
-		if ($needId) {
-			$fields .= '<input type="hidden" name="Itemid" value="' . JFactory::getApplication()->input->get('Itemid', '0', 'int') . '" />';
+
+		// Add a field for Itemid if we need one.
+		if ($needId)
+		{
+			$id = JFactory::getApplication()->input->get('Itemid', '0', 'int');
+			$fields[] = '<input type="hidden" name="Itemid" value="' . $id . '" />';
 		}
-		return $fields;
+
+		return implode('', $fields);
 	}
 
 	/**
 	 * Get Smart Search query object.
 	 *
-	 * @param   JRegistry object containing module parameters.
+	 * @param   \Joomla\Registry\Registry  $params  Module parameters.
 	 *
 	 * @return  FinderIndexerQuery object
 	 *
@@ -81,5 +85,4 @@ class ModFinderHelper
 
 		return $query;
 	}
-
 }

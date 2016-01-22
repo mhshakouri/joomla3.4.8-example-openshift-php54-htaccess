@@ -3,21 +3,20 @@
  * @package     Joomla.Platform
  * @subpackage  Document
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('JPATH_PLATFORM') or die;
 
-jimport('joomla.application.module.helper');
+use Joomla\Registry\Registry;
+
 jimport('joomla.utilities.utility');
 
 /**
  * DocumentHTML class, provides an easy interface to parse and display a HTML document
  *
- * @package     Joomla.Platform
- * @subpackage  Document
- * @since       11.1
+ * @since  11.1
  */
 class JDocumentHTML extends JDocument
 {
@@ -94,6 +93,14 @@ class JDocumentHTML extends JDocument
 	protected $_caching = null;
 
 	/**
+	 * Set to true when the document should be output as HTML5
+	 *
+	 * @var    boolean
+	 * @since  12.1
+	 */
+	private $_html5 = null;
+
+	/**
 	 * Class constructor
 	 *
 	 * @param   array  $options  Associative array of options
@@ -131,6 +138,8 @@ class JDocumentHTML extends JDocument
 		$data['scripts']     = $this->_scripts;
 		$data['script']      = $this->_script;
 		$data['custom']      = $this->_custom;
+		$data['scriptText']  = JText::script();
+
 		return $data;
 	}
 
@@ -150,16 +159,24 @@ class JDocumentHTML extends JDocument
 			return;
 		}
 
-		$this->title = (isset($data['title']) && !empty($data['title'])) ? $data['title'] : $this->title;
-		$this->description = (isset($data['description']) && !empty($data['description'])) ? $data['description'] : $this->description;
-		$this->link = (isset($data['link']) && !empty($data['link'])) ? $data['link'] : $this->link;
-		$this->_metaTags = (isset($data['metaTags']) && !empty($data['metaTags'])) ? $data['metaTags'] : $this->_metaTags;
-		$this->_links = (isset($data['links']) && !empty($data['links'])) ? $data['links'] : $this->_links;
+		$this->title        = (isset($data['title']) && !empty($data['title'])) ? $data['title'] : $this->title;
+		$this->description  = (isset($data['description']) && !empty($data['description'])) ? $data['description'] : $this->description;
+		$this->link         = (isset($data['link']) && !empty($data['link'])) ? $data['link'] : $this->link;
+		$this->_metaTags    = (isset($data['metaTags']) && !empty($data['metaTags'])) ? $data['metaTags'] : $this->_metaTags;
+		$this->_links       = (isset($data['links']) && !empty($data['links'])) ? $data['links'] : $this->_links;
 		$this->_styleSheets = (isset($data['styleSheets']) && !empty($data['styleSheets'])) ? $data['styleSheets'] : $this->_styleSheets;
-		$this->_style = (isset($data['style']) && !empty($data['style'])) ? $data['style'] : $this->_style;
-		$this->_scripts = (isset($data['scripts']) && !empty($data['scripts'])) ? $data['scripts'] : $this->_scripts;
-		$this->_script = (isset($data['script']) && !empty($data['script'])) ? $data['script'] : $this->_script;
-		$this->_custom = (isset($data['custom']) && !empty($data['custom'])) ? $data['custom'] : $this->_custom;
+		$this->_style       = (isset($data['style']) && !empty($data['style'])) ? $data['style'] : $this->_style;
+		$this->_scripts     = (isset($data['scripts']) && !empty($data['scripts'])) ? $data['scripts'] : $this->_scripts;
+		$this->_script      = (isset($data['script']) && !empty($data['script'])) ? $data['script'] : $this->_script;
+		$this->_custom      = (isset($data['custom']) && !empty($data['custom'])) ? $data['custom'] : $this->_custom;
+
+		if (isset($data['scriptText']) && !empty($data['scriptText']))
+		{
+			foreach ($data['scriptText'] as $key => $string)
+			{
+				JText::script($key, $string);
+			}
+		}
 
 		return $this;
 	}
@@ -175,7 +192,6 @@ class JDocumentHTML extends JDocument
 	 */
 	public function mergeHeadData($data)
 	{
-
 		if (empty($data) || !is_array($data))
 		{
 			return;
@@ -194,6 +210,7 @@ class JDocumentHTML extends JDocument
 			foreach ($data['metaTags'] as $type1 => $data1)
 			{
 				$booldog = $type1 == 'http-equiv' ? true : false;
+
 				foreach ($data1 as $name2 => $data2)
 				{
 					$this->setMetaData($name2, $data2, $booldog);
@@ -306,6 +323,35 @@ class JDocumentHTML extends JDocument
 	}
 
 	/**
+	 * Returns whether the document is set up to be output as HTML5
+	 *
+	 * @return  Boolean true when HTML5 is used
+	 *
+	 * @since   12.1
+	 */
+	public function isHtml5()
+	{
+		return $this->_html5;
+	}
+
+	/**
+	 * Sets whether the document should be output as HTML5
+	 *
+	 * @param   bool  $state  True when HTML5 should be output
+	 *
+	 * @return  void
+	 *
+	 * @since   12.1
+	 */
+	public function setHtml5($state)
+	{
+		if (is_bool($state))
+		{
+			$this->_html5 = $state;
+		}
+	}
+
+	/**
 	 * Get the contents of a document include
 	 *
 	 * @param   string  $type     The type of renderer
@@ -324,23 +370,19 @@ class JDocumentHTML extends JDocument
 			return parent::$_buffer;
 		}
 
-		$result = null;
-		if (isset(parent::$_buffer[$type][$name]))
-		{
-			return parent::$_buffer[$type][$name];
-		}
+		$title = (isset($attribs['title'])) ? $attribs['title'] : null;
 
-		// If the buffer has been explicitly turned off don't display or attempt to render
-		if ($result === false)
+		if (isset(parent::$_buffer[$type][$name][$title]))
 		{
-			return null;
+			return parent::$_buffer[$type][$name][$title];
 		}
 
 		$renderer = $this->loadRenderer($type);
+
 		if ($this->_caching == true && $type == 'modules')
 		{
 			$cache = JFactory::getCache('com_modules', '');
-			$hash = md5(serialize(array($name, $attribs, $result, $renderer)));
+			$hash = md5(serialize(array($name, $attribs, null, $renderer)));
 			$cbuffer = $cache->get('cbuffer_' . $type);
 
 			if (isset($cbuffer[$hash]))
@@ -349,14 +391,13 @@ class JDocumentHTML extends JDocument
 			}
 			else
 			{
-
 				$options = array();
 				$options['nopathway'] = 1;
 				$options['nomodules'] = 1;
 				$options['modulemode'] = 1;
 
-				$this->setBuffer($renderer->render($name, $attribs, $result), $type, $name);
-				$data = parent::$_buffer[$type][$name];
+				$this->setBuffer($renderer->render($name, $attribs, null), $type, $name);
+				$data = parent::$_buffer[$type][$name][$title];
 
 				$tmpdata = JCache::setWorkarounds($data, $options);
 
@@ -364,14 +405,13 @@ class JDocumentHTML extends JDocument
 
 				$cache->store($cbuffer, 'cbuffer_' . $type);
 			}
-
 		}
 		else
 		{
-			$this->setBuffer($renderer->render($name, $attribs, $result), $type, $name);
+			$this->setBuffer($renderer->render($name, $attribs, null), $type, $name, $title);
 		}
 
-		return parent::$_buffer[$type][$name];
+		return parent::$_buffer[$type][$name][$title];
 	}
 
 	/**
@@ -393,9 +433,10 @@ class JDocumentHTML extends JDocument
 			$options = array();
 			$options['type'] = $args[1];
 			$options['name'] = (isset($args[2])) ? $args[2] : null;
+			$options['title'] = (isset($args[3])) ? $args[3] : null;
 		}
 
-		parent::$_buffer[$options['type']][$options['name']] = $content;
+		parent::$_buffer[$options['type']][$options['name']][$options['title']] = $content;
 
 		return $this;
 	}
@@ -428,17 +469,14 @@ class JDocumentHTML extends JDocument
 	{
 		$this->_caching = $caching;
 
-		if (!empty($this->_template))
-		{
-			$data = $this->_renderTemplate();
-		}
-		else
+		if (empty($this->_template))
 		{
 			$this->parse($params);
-			$data = $this->_renderTemplate();
 		}
 
+		$data = $this->_renderTemplate();
 		parent::render();
+
 		return $data;
 	}
 
@@ -455,9 +493,21 @@ class JDocumentHTML extends JDocument
 	{
 		$operators = '(\+|\-|\*|\/|==|\!=|\<\>|\<|\>|\<=|\>=|and|or|xor)';
 		$words = preg_split('# ' . $operators . ' #', $condition, null, PREG_SPLIT_DELIM_CAPTURE);
+
+		if (count($words) === 1)
+		{
+			$name = strtolower($words[0]);
+			$result = ((isset(parent::$_buffer['modules'][$name])) && (parent::$_buffer['modules'][$name] === false))
+				? 0 : count(JModuleHelper::getModules($name));
+
+			return $result;
+		}
+
+		JLog::add('Using an expression in JDocumentHtml::countModules() is deprecated.', JLog::WARNING, 'deprecated');
+
 		for ($i = 0, $n = count($words); $i < $n; $i += 2)
 		{
-			// odd parts (modules)
+			// Odd parts (modules)
 			$name = strtolower($words[$i]);
 			$words[$i] = ((isset(parent::$_buffer['modules'][$name])) && (parent::$_buffer['modules'][$name] === false))
 				? 0
@@ -482,22 +532,21 @@ class JDocumentHTML extends JDocument
 
 		if (!isset($children))
 		{
-			$dbo = JFactory::getDbo();
+			$db = JFactory::getDbo();
 			$app = JFactory::getApplication();
 			$menu = $app->getMenu();
 			$active = $menu->getActive();
+			$children = 0;
+
 			if ($active)
 			{
-				$query->getQuery(true);
-				$query->select('COUNT(*)');
-				$query->from('#__menu');
-				$query->where('parent_id = ' . $active->id);
-				$query->where('published = 1');
-				$children = $dbo->loadResult();
-			}
-			else
-			{
-				$children = 0;
+				$query = $db->getQuery(true)
+					->select('COUNT(*)')
+					->from('#__menu')
+					->where('parent_id = ' . $active->id)
+					->where('published = 1');
+				$db->setQuery($query);
+				$children = $db->loadResult();
 			}
 		}
 
@@ -516,8 +565,6 @@ class JDocumentHTML extends JDocument
 	 */
 	protected function _loadTemplate($directory, $filename)
 	{
-		//		$component	= JApplicationHelper::getComponentName();
-
 		$contents = '';
 
 		// Check to see if we have a valid template file
@@ -526,7 +573,7 @@ class JDocumentHTML extends JDocument
 			// Store the file path
 			$this->_file = $directory . '/' . $filename;
 
-			//get the file content
+			// Get the file content
 			ob_start();
 			require $directory . '/' . $filename;
 			$contents = ob_get_contents();
@@ -534,16 +581,15 @@ class JDocumentHTML extends JDocument
 		}
 
 		// Try to find a favicon by checking the template and root folder
-		$path = $directory . '/';
-		$dirs = array($path, JPATH_BASE . '/');
-		foreach ($dirs as $dir)
+		$icon = '/favicon.ico';
+
+		foreach (array($directory, JPATH_BASE) as $dir)
 		{
-			$icon = $dir . 'favicon.ico';
-			if (file_exists($icon))
+			if (file_exists($dir . $icon))
 			{
-				$path = str_replace(JPATH_BASE . '/', '', $dir);
+				$path = str_replace(JPATH_BASE, '', $dir);
 				$path = str_replace('\\', '/', $path);
-				$this->addFavicon(JURI::base(true) . '/' . $path . 'favicon.ico');
+				$this->addFavicon(JUri::base(true) . $path . $icon);
 				break;
 			}
 		}
@@ -575,17 +621,15 @@ class JDocumentHTML extends JDocument
 
 		// Load the language file for the template
 		$lang = JFactory::getLanguage();
-		// 1.5 or core then 1.6
 
-		$lang->load('tpl_' . $template, JPATH_BASE, null, false, false)
-			|| $lang->load('tpl_' . $template, $directory . '/' . $template, null, false, false)
-			|| $lang->load('tpl_' . $template, JPATH_BASE, $lang->getDefault(), false, false)
-			|| $lang->load('tpl_' . $template, $directory . '/' . $template, $lang->getDefault(), false, false);
+		// 1.5 or core then 1.6
+		$lang->load('tpl_' . $template, JPATH_BASE, null, false, true)
+			|| $lang->load('tpl_' . $template, $directory . '/' . $template, null, false, true);
 
 		// Assign the variables
 		$this->template = $template;
-		$this->baseurl = JURI::base(true);
-		$this->params = isset($params['params']) ? $params['params'] : new JRegistry;
+		$this->baseurl = JUri::base(true);
+		$this->params = isset($params['params']) ? $params['params'] : new Registry;
 
 		// Load
 		$this->_template = $this->_loadTemplate($directory . '/' . $template, $file);
@@ -596,9 +640,7 @@ class JDocumentHTML extends JDocument
 	/**
 	 * Parse a document template
 	 *
-	 * @return  The parsed contents of the template
-	 *
-	 * @return  JDocumentHTML instance of $this to allow chaining
+	 * @return  JDocumentHTML  instance of $this to allow chaining
 	 *
 	 * @since   11.1
 	 */
@@ -606,7 +648,7 @@ class JDocumentHTML extends JDocument
 	{
 		$matches = array();
 
-		if (preg_match_all('#<jdoc:include\ type="([^"]+)" (.*)\/>#iU', $this->_template, $matches))
+		if (preg_match_all('#<jdoc:include\ type="([^"]+)"(.*)\/>#iU', $this->_template, $matches))
 		{
 			$template_tags_first = array();
 			$template_tags_last = array();

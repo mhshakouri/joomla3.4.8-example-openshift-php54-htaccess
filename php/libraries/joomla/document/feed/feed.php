@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Document
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -12,9 +12,7 @@ defined('JPATH_PLATFORM') or die;
 /**
  * DocumentFeed class, provides an easy interface to parse and display any feed document
  *
- * @package     Joomla.Platform
- * @subpackage  Document
- * @since       11.1
+ * @since  11.1
  */
 class JDocumentFeed extends JDocument
 {
@@ -175,7 +173,7 @@ class JDocumentFeed extends JDocument
 	{
 		parent::__construct($options);
 
-		//set document type
+		// Set document type
 		$this->_type = 'feed';
 	}
 
@@ -188,21 +186,22 @@ class JDocumentFeed extends JDocument
 	 * @return  The rendered data
 	 *
 	 * @since  11.1
+	 * @throws Exception
 	 * @todo   Make this cacheable
 	 */
 	public function render($cache = false, $params = array())
 	{
-		global $option;
-
 		// Get the feed type
-		$type = JRequest::getCmd('type', 'rss');
+		$type = JFactory::getApplication()->input->get('type', 'rss');
 
 		// Instantiate feed renderer and set the mime encoding
 		$renderer = $this->loadRenderer(($type) ? $type : 'rss');
+
 		if (!is_a($renderer, 'JDocumentRenderer'))
 		{
-			JError::raiseError(404, JText::_('JGLOBAL_RESOURCE_NOT_FOUND'));
+			throw new Exception(JText::_('JGLOBAL_RESOURCE_NOT_FOUND'), 404);
 		}
+
 		$this->setMimeEncoding($renderer->getContentType());
 
 		// Output
@@ -220,19 +219,20 @@ class JDocumentFeed extends JDocument
 		$data .= $renderer->render();
 
 		parent::render();
+
 		return $data;
 	}
 
 	/**
 	 * Adds an JFeedItem to the feed.
 	 *
-	 * @param   JFeedItem  &$item  The feeditem to add to the feed.
+	 * @param   JFeedItem  $item  The feeditem to add to the feed.
 	 *
 	 * @return  JDocumentFeed  instance of $this to allow chaining
 	 *
 	 * @since   11.1
 	 */
-	public function addItem(&$item)
+	public function addItem(JFeedItem $item)
 	{
 		$item->source = $this->link;
 		$this->items[] = $item;
@@ -244,13 +244,10 @@ class JDocumentFeed extends JDocument
 /**
  * JFeedItem is an internal class that stores feed item information
  *
- * @package     Joomla.Platform
- * @subpackage  Document
- * @since       11.1
+ * @since  11.1
  */
-class JFeedItem extends JObject
+class JFeedItem
 {
-
 	/**
 	 * Title item element
 	 *
@@ -374,13 +371,13 @@ class JFeedItem extends JObject
 	/**
 	 * Set the JFeedEnclosure for this item
 	 *
-	 * @param   object  $enclosure  The JFeedItem to add to the feed.
+	 * @param   JFeedEnclosure  $enclosure  The JFeedEnclosure to add to the feed.
 	 *
 	 * @return  JFeedItem instance of $this to allow chaining
 	 *
 	 * @since   11.1
 	 */
-	public function setEnclosure($enclosure)
+	public function setEnclosure(JFeedEnclosure $enclosure)
 	{
 		$this->enclosure = $enclosure;
 
@@ -391,13 +388,10 @@ class JFeedItem extends JObject
 /**
  * JFeedEnclosure is an internal class that stores feed enclosure information
  *
- * @package     Joomla.Platform
- * @subpackage  Document
- * @since       11.1
+ * @since  11.1
  */
-class JFeedEnclosure extends JObject
+class JFeedEnclosure
 {
-
 	/**
 	 * URL enclosure element
 	 *
@@ -432,13 +426,10 @@ class JFeedEnclosure extends JObject
 /**
  * JFeedImage is an internal class that stores feed image information
  *
- * @package     Joomla.Platform
- * @subpackage  Document
- * @since       11.1
+ * @since  11.1
  */
-class JFeedImage extends JObject
+class JFeedImage
 {
-
 	/**
 	 * Title image attribute
 	 *

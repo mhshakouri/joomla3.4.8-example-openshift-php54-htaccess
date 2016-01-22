@@ -1,22 +1,29 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Administrator
+ * @subpackage  com_content
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// no direct access
 defined('_JEXEC') or die;
 
 /**
- * @package		Joomla.Administrator
- * @subpackage	com_content
+ * Featured Table class.
+ *
+ * @since  1.6
  */
 class ContentTableFeatured extends JTable
 {
 	/**
-	 * @param	JDatabase	A database connector object
+	 * Constructor
+	 *
+	 * @param   JDatabaseDriver  &$db  Database connector object
+	 *
+	 * @since   1.6
 	 */
-	function __construct(&$db)
+	public function __construct(&$db)
 	{
 		parent::__construct('#__content_frontpage', 'content_id', $db);
 	}

@@ -3,20 +3,16 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.modellist');
-
 /**
  * Index model class for Finder.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderModelIndex extends JModelList
 {
@@ -72,6 +68,7 @@ class FinderModelIndex extends JModelList
 	protected function canDelete($record)
 	{
 		$user = JFactory::getUser();
+
 		return $user->authorise('core.delete', $this->option);
 	}
 
@@ -87,6 +84,7 @@ class FinderModelIndex extends JModelList
 	protected function canEditState($record)
 	{
 		$user = JFactory::getUser();
+
 		return $user->authorise('core.edit.state', $this->option);
 	}
 
@@ -101,15 +99,12 @@ class FinderModelIndex extends JModelList
 	 */
 	public function delete(&$pks)
 	{
-		// Initialise variables.
-		$dispatcher = JDispatcher::getInstance();
-		$user = JFactory::getUser();
+		$dispatcher = JEventDispatcher::getInstance();
 		$pks = (array) $pks;
 		$table = $this->getTable();
 
-		// Include the content and finder plugins for the on delete events.
+		// Include the content plugins for the on delete events.
 		JPluginHelper::importPlugin('content');
-		JPluginHelper::importPlugin('finder');
 
 		// Iterate the items to delete each one.
 		foreach ($pks as $i => $pk)
@@ -122,15 +117,18 @@ class FinderModelIndex extends JModelList
 
 					// Trigger the onContentBeforeDelete event.
 					$result = $dispatcher->trigger($this->event_before_delete, array($context, $table));
+
 					if (in_array(false, $result, true))
 					{
 						$this->setError($table->getError());
+
 						return false;
 					}
 
 					if (!$table->delete($pk))
 					{
 						$this->setError($table->getError());
+
 						return false;
 					}
 
@@ -142,6 +140,7 @@ class FinderModelIndex extends JModelList
 					// Prune items that you can't change.
 					unset($pks[$i]);
 					$error = $this->getError();
+
 					if ($error)
 					{
 						$this->setError($error);
@@ -155,6 +154,7 @@ class FinderModelIndex extends JModelList
 			else
 			{
 				$this->setError($table->getError());
+
 				return false;
 			}
 		}
@@ -175,35 +175,35 @@ class FinderModelIndex extends JModelList
 	protected function getListQuery()
 	{
 		$db = $this->getDbo();
-		$query = $db->getQuery(true);
-
-		$query->select('l.*');
-		$query->select('t.title AS t_title');
-		$query->from($db->quoteName('#__finder_links') . ' AS l');
-		$query->join('INNER', $db->quoteName('#__finder_types') . ' AS t ON t.id = l.type_id');
+		$query = $db->getQuery(true)
+			->select('l.*')
+			->select('t.title AS t_title')
+			->from($db->quoteName('#__finder_links') . ' AS l')
+			->join('INNER', $db->quoteName('#__finder_types') . ' AS t ON t.id = l.type_id');
 
 		// Check the type filter.
 		if ($this->getState('filter.type'))
 		{
-			$query->where($db->quoteName('l.type_id') . ' = ' . (int) $this->getState('filter.type'));
+			$query->where('l.type_id = ' . (int) $this->getState('filter.type'));
 		}
 
 		// Check for state filter.
 		if (is_numeric($this->getState('filter.state')))
 		{
-			$query->where($db->quoteName('l.published') . ' = ' . (int) $this->getState('filter.state'));
+			$query->where('l.published = ' . (int) $this->getState('filter.state'));
 		}
 
 		// Check the search phrase.
 		if ($this->getState('filter.search') != '')
 		{
-			$search = $db->escape($this->getState('filter.search'));
-			$query->where($db->quoteName('l.title') . ' LIKE "%' . $db->escape($search) . '%"' . ' OR ' . $db->quoteName('l.url') . ' LIKE "%' . $db->escape($search) . '%"' . ' OR ' . $db->quoteName('l.indexdate') . ' LIKE "%' . $db->escape($search) . '%"');
+			$search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($this->getState('filter.search')), true) . '%'));
+			$query->where('l.title LIKE ' . $search . ' OR l.url LIKE ' . $search . ' OR l.indexdate LIKE  ' . $search);
 		}
 
 		// Handle the list ordering.
 		$ordering = $this->getState('list.ordering');
 		$direction = $this->getState('list.direction');
+
 		if (!empty($ordering))
 		{
 			$query->order($db->escape($ordering) . ' ' . $db->escape($direction));
@@ -212,7 +212,7 @@ class FinderModelIndex extends JModelList
 		return $query;
 	}
 
- 	/**
+	/**
 	 * Method to get the state of the Smart Search plug-ins.
 	 *
 	 * @return  array   Array of relevant plug-ins and whether they are enabled or not.
@@ -222,15 +222,14 @@ class FinderModelIndex extends JModelList
 	public function getPluginState()
 	{
 		$db = $this->getDbo();
-		$query = $db->getQuery(true);
-
-		$query->select('name, enabled');
-		$query->from($db->quoteName('#__extensions'));
-		$query->where($db->quoteName('type') . ' = ' .  $db->quote('plugin'));
-		$query->where($db->quoteName('folder') . ' IN(' .  $db->quote('system') . ',' . $db->quote('content') . ')');
-		$query->where($db->quoteName('element') . ' = ' .  $db->quote('finder'));
+		$query = $db->getQuery(true)
+			->select('name, enabled')
+			->from($db->quoteName('#__extensions'))
+			->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
+			->where($db->quoteName('folder') . ' IN(' . $db->quote('system') . ',' . $db->quote('content') . ')')
+			->where($db->quoteName('element') . ' = ' . $db->quote('finder'));
 		$db->setQuery($query);
-		$db->query();
+		$db->execute();
 		$plugins = $db->loadObjectList('name');
 
 		return $plugins;
@@ -281,6 +280,7 @@ class FinderModelIndex extends JModelList
 	 * @return  boolean  True on success, false on failure.
 	 *
 	 * @since   2.5
+	 * @throws  Exception on database error
 	 */
 	public function purge()
 	{
@@ -289,13 +289,6 @@ class FinderModelIndex extends JModelList
 		// Truncate the links table.
 		$db->truncateTable('#__finder_links');
 
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
-
 		// Truncate the links terms tables.
 		for ($i = 0; $i <= 15; $i++)
 		{
@@ -303,69 +296,26 @@ class FinderModelIndex extends JModelList
 			$suffix = dechex($i);
 
 			$db->truncateTable('#__finder_links_terms' . $suffix);
-
-			// Check for a database error.
-			if ($db->getErrorNum())
-			{
-				// Throw database error exception.
-				throw new Exception($db->getErrorMsg(), 500);
-			}
 		}
 
 		// Truncate the terms table.
 		$db->truncateTable('#__finder_terms');
 
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
-
 		// Truncate the taxonomy map table.
 		$db->truncateTable('#__finder_taxonomy_map');
 
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
-
 		// Delete all the taxonomy nodes except the root.
-		$query = $db->getQuery(true);
-		$query->delete();
-		$query->from($db->quoteName('#__finder_taxonomy'));
-		$query->where($db->quoteName('id') . ' > 1');
+		$query = $db->getQuery(true)
+			->delete($db->quoteName('#__finder_taxonomy'))
+			->where($db->quoteName('id') . ' > 1');
 		$db->setQuery($query);
-		$db->query();
-
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
+		$db->execute();
 
 		// Truncate the tokens tables.
 		$db->truncateTable('#__finder_tokens');
 
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
-
 		// Truncate the tokens aggregate table.
 		$db->truncateTable('#__finder_tokens_aggregate');
-
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
 
 		return true;
 	}
@@ -412,8 +362,7 @@ class FinderModelIndex extends JModelList
 	 */
 	public function publish(&$pks, $value = 1)
 	{
-		// Initialise variables.
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$user = JFactory::getUser();
 		$table = $this->getTable();
 		$pks = (array) $pks;
@@ -433,6 +382,7 @@ class FinderModelIndex extends JModelList
 					// Prune items that you can't change.
 					unset($pks[$i]);
 					$this->setError(JText::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+
 					return false;
 				}
 			}
@@ -442,6 +392,7 @@ class FinderModelIndex extends JModelList
 		if (!$table->publish($pks, $value, $user->get('id')))
 		{
 			$this->setError($table->getError());
+
 			return false;
 		}
 
@@ -453,6 +404,7 @@ class FinderModelIndex extends JModelList
 		if (in_array(false, $result, true))
 		{
 			$this->setError($table->getError());
+
 			return false;
 		}
 

@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Document
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -12,11 +12,9 @@ defined('JPATH_PLATFORM') or die;
 /**
  * Abstract class for a renderer
  *
- * @package     Joomla.Platform
- * @subpackage  Document
- * @since       11.1
+ * @since  11.1
  */
-class JDocumentRenderer extends JObject
+class JDocumentRenderer
 {
 	/**
 	 * Reference to the JDocument object that instantiated the renderer
@@ -24,7 +22,7 @@ class JDocumentRenderer extends JObject
 	 * @var    JDocument
 	 * @since  11.1
 	 */
-	protected	$_doc = null;
+	protected $_doc = null;
 
 	/**
 	 * Renderer mime type
@@ -37,13 +35,13 @@ class JDocumentRenderer extends JObject
 	/**
 	 * Class constructor
 	 *
-	 * @param   JDocument  &$doc  A reference to the JDocument object that instantiated the renderer
+	 * @param   JDocument  $doc  A reference to the JDocument object that instantiated the renderer
 	 *
 	 * @since   11.1
 	 */
-	public function __construct(&$doc)
+	public function __construct(JDocument $doc)
 	{
-		$this->_doc = &$doc;
+		$this->_doc = $doc;
 	}
 
 	/**
@@ -71,5 +69,22 @@ class JDocumentRenderer extends JObject
 	public function getContentType()
 	{
 		return $this->_mime;
+	}
+
+	/**
+	 * Convert links in a text from relative to absolute
+	 *
+	 * @param   string  $text  The text processed
+	 *
+	 * @return  string   Text with converted links
+	 *
+	 * @since   11.1
+	 */
+	protected function _relToAbs($text)
+	{
+		$base = JUri::base();
+		$text = preg_replace("/(href|src)=\"(?!http|ftp|https|mailto|data)([^\"]*)\"/", "$1=\"$base\$2\"", $text);
+
+		return $text;
 	}
 }

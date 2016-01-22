@@ -2,27 +2,25 @@
 /**
  * @package     Joomla.Administrator
  * @subpackage  com_joomlaupdate
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access.
 defined('_JEXEC') or die;
 
 /**
  * Joomla! update selection list helper.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_joomlaupdate
- * @since       2.5.4
+ * @since  2.5.4
  */
 class JoomlaupdateHelperSelect
 {
 	/**
 	 * Returns an HTML select element with the different extraction modes
-	 * 
+	 *
 	 * @param   string  $default  The default value of the select element
-	 * 
+	 *
 	 * @return  string
 	 *
 	 * @since   2.5.4

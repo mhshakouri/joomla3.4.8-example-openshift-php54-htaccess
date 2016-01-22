@@ -3,25 +3,25 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 /**
  * Filter table class for the Finder package.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderTableFilter extends JTable
 {
 	/**
 	 * Constructor
 	 *
-	 * @param   object  &$db  JDatabase connector object.
+	 * @param   JDatabaseDriver  &$db  JDatabaseDriver connector object.
 	 *
 	 * @since   2.5
 	 */
@@ -47,7 +47,7 @@ class FinderTableFilter extends JTable
 	{
 		if (isset($array['params']) && is_array($array['params']))
 		{
-			$registry = new JRegistry;
+			$registry = new Registry;
 			$registry->loadArray($array['params']);
 			$array['params'] = (string) $registry;
 		}
@@ -107,7 +107,6 @@ class FinderTableFilter extends JTable
 	 */
 	public function publish($pks = null, $state = 1, $userId = 0)
 	{
-		// Initialise variables.
 		$k = $this->_tbl_key;
 
 		// Sanitize input.
@@ -126,6 +125,7 @@ class FinderTableFilter extends JTable
 			else
 			{
 				$this->setError(JText::_('JLIB_DATABASE_ERROR_NO_ROWS_SELECTED'));
+
 				return false;
 			}
 		}
@@ -144,17 +144,20 @@ class FinderTableFilter extends JTable
 		}
 
 		// Update the publishing state for rows with the given primary keys.
-		$query = $this->_db->getQuery(true);
-		$query->update($this->_db->quoteName($this->_tbl));
-		$query->set($this->_db->quoteName('state') . ' = ' . (int) $state);
-		$query->where($where);
+		$query = $this->_db->getQuery(true)
+			->update($this->_db->quoteName($this->_tbl))
+			->set($this->_db->quoteName('state') . ' = ' . (int) $state)
+			->where($where);
 		$this->_db->setQuery($query . $checkin);
-		$this->_db->query();
 
-		// Check for a database error.
-		if ($this->_db->getErrorNum())
+		try
 		{
-			$this->setError($this->_db->getErrorMsg());
+			$this->_db->execute();
+		}
+		catch (RuntimeException $e)
+		{
+			$this->setError($e->getMessage());
+
 			return false;
 		}
 
@@ -197,20 +200,22 @@ class FinderTableFilter extends JTable
 		$date = JFactory::getDate();
 		$user = JFactory::getUser();
 
+		$this->modified = $date->toSql();
+
 		if ($this->filter_id)
 		{
 			// Existing item
-			$this->modified = $date->toMySQL();
 			$this->modified_by = $user->get('id');
 		}
 		else
 		{
 			// New item. A filter's created field can be set by the user,
 			// so we don't touch it if it is set.
-			if (!intval($this->created))
+			if (!(int) $this->created)
 			{
-				$this->created = $date->toMySQL();
+				$this->created = $date->toSql();
 			}
+
 			if (empty($this->created_by))
 			{
 				$this->created_by = $user->get('id');
@@ -230,11 +235,14 @@ class FinderTableFilter extends JTable
 
 		// Verify that the alias is unique
 		$table = JTable::getInstance('Filter', 'FinderTable');
+
 		if ($table->load(array('alias' => $this->alias)) && ($table->filter_id != $this->filter_id || $this->filter_id == 0))
 		{
 			$this->setError(JText::_('JLIB_DATABASE_ERROR_ARTICLE_UNIQUE_ALIAS'));
+
 			return false;
 		}
+
 		return parent::store($updateNulls);
 	}
 }

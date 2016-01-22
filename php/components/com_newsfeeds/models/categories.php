@@ -1,19 +1,22 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Site
+ * @subpackage  com_newsfeeds
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 /**
  * This models supports retrieving lists of newsfeed categories.
  *
- * @package		Joomla.Site
- * @subpackage	com_newsfeeds
- * @since		1.6
+ * @since  1.6
  */
-class NewsfeedsModelCategories extends JModelLegacy
+class NewsfeedsModelCategories extends JModelList
 {
 	/**
 	 * Model context string.
@@ -38,15 +41,23 @@ class NewsfeedsModelCategories extends JModelLegacy
 	 *
 	 * Note. Calling getState in this method will result in recursion.
 	 *
-	 * @since	1.6
+	 * @param   string  $ordering   An optional ordering field
+	 * @param   string  $direction  An optional direction [asc|desc]
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 *
+	 * @since   1.6
 	 */
-	protected function populateState()
+
+	protected function populateState($ordering = null, $direction = null)
 	{
 		$app = JFactory::getApplication();
 		$this->setState('filter.extension', $this->_extension);
 
 		// Get the parent id if defined.
-		$parentId = JRequest::getInt('id');
+		$parentId = $app->input->getInt('id');
 		$this->setState('filter.parentId', $parentId);
 
 		$params = $app->getParams();
@@ -63,17 +74,17 @@ class NewsfeedsModelCategories extends JModelLegacy
 	 * different modules that might need different sets of data or different
 	 * ordering requirements.
 	 *
-	 * @param	string		$id	A prefix for the store id.
+	 * @param   string  $id  A prefix for the store id.
 	 *
-	 * @return	string		A store id.
+	 * @return  string  A store id.
 	 */
 	protected function getStoreId($id = '')
 	{
 		// Compile the store id.
-		$id	.= ':'.$this->getState('filter.extension');
-		$id	.= ':'.$this->getState('filter.published');
-		$id	.= ':'.$this->getState('filter.access');
-		$id	.= ':'.$this->getState('filter.parentId');
+		$id .= ':' . $this->getState('filter.extension');
+		$id .= ':' . $this->getState('filter.published');
+		$id .= ':' . $this->getState('filter.access');
+		$id .= ':' . $this->getState('filter.parentId');
 
 		return parent::getStoreId($id);
 	}
@@ -85,24 +96,29 @@ class NewsfeedsModelCategories extends JModelLegacy
 	 */
 	public function getItems()
 	{
-		if(!count($this->_items))
+		if (!count($this->_items))
 		{
 			$app = JFactory::getApplication();
 			$menu = $app->getMenu();
 			$active = $menu->getActive();
-			$params = new JRegistry();
-			if($active)
+			$params = new Registry;
+
+			if ($active)
 			{
 				$params->loadString($active->params);
 			}
+
 			$options = array();
 			$options['countItems'] = $params->get('show_cat_items_cat', 1) || !$params->get('show_empty_categories_cat', 0);
 			$categories = JCategories::getInstance('Newsfeeds', $options);
 			$this->_parent = $categories->get($this->getState('filter.parentId', 'root'));
-			if(is_object($this->_parent))
+
+			if (is_object($this->_parent))
 			{
 				$this->_items = $this->_parent->getChildren();
-			} else {
+			}
+			else
+			{
 				$this->_items = false;
 			}
 		}
@@ -110,12 +126,18 @@ class NewsfeedsModelCategories extends JModelLegacy
 		return $this->_items;
 	}
 
+	/**
+	 * get the Parent
+	 *
+	 * @return null
+	 */
 	public function getParent()
 	{
-		if(!is_object($this->_parent))
+		if (!is_object($this->_parent))
 		{
 			$this->getItems();
 		}
+
 		return $this->_parent;
 	}
 }

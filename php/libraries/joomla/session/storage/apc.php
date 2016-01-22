@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Session
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -12,10 +12,8 @@ defined('JPATH_PLATFORM') or die;
 /**
  * APC session storage handler for PHP
  *
- * @package     Joomla.Platform
- * @subpackage  Session
- * @see         http://www.php.net/manual/en/function.session-set-save-handler.php
- * @since       11.1
+ * @see    http://www.php.net/manual/en/function.session-set-save-handler.php
+ * @since  11.1
  */
 class JSessionStorageApc extends JSessionStorage
 {
@@ -25,12 +23,13 @@ class JSessionStorageApc extends JSessionStorage
 	 * @param   array  $options  Optional parameters
 	 *
 	 * @since   11.1
+	 * @throws  RuntimeException
 	 */
 	public function __construct($options = array())
 	{
-		if (!$this->test())
+		if (!self::isSupported())
 		{
-			return JError::raiseError(404, JText::_('JLIB_SESSION_APC_EXTENSION_NOT_AVAILABLE'));
+			throw new RuntimeException('APC Extension is not available', 404);
 		}
 
 		parent::__construct($options);
@@ -49,6 +48,7 @@ class JSessionStorageApc extends JSessionStorage
 	public function read($id)
 	{
 		$sess_id = 'sess_' . $id;
+
 		return (string) apc_fetch($sess_id);
 	}
 
@@ -65,6 +65,7 @@ class JSessionStorageApc extends JSessionStorage
 	public function write($id, $session_data)
 	{
 		$sess_id = 'sess_' . $id;
+
 		return apc_store($sess_id, $session_data, ini_get("session.gc_maxlifetime"));
 	}
 
@@ -80,6 +81,7 @@ class JSessionStorageApc extends JSessionStorage
 	public function destroy($id)
 	{
 		$sess_id = 'sess_' . $id;
+
 		return apc_delete($sess_id);
 	}
 
@@ -87,8 +89,10 @@ class JSessionStorageApc extends JSessionStorage
 	 * Test to see if the SessionHandler is available.
 	 *
 	 * @return boolean  True on success, false otherwise.
+	 *
+	 * @since   12.1
 	 */
-	public static function test()
+	public static function isSupported()
 	{
 		return extension_loaded('apc');
 	}

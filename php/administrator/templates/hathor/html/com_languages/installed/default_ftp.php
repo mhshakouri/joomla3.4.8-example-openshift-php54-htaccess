@@ -1,11 +1,10 @@
 <?php
 /**
- * @version		$Id: default_ftp.php 21529 2011-06-11 22:17:15Z chdemko $
- * @package		Joomla.Administrator
- * @subpackage	Templates.hathor
- * @copyright	Copyright (C) 2005 - 2011 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
- * @since		1.6
+ * @package     Joomla.Administrator
+ * @subpackage  Template.hathor
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -15,16 +14,16 @@ defined('_JEXEC') or die;
 
 		<?php echo JText::_('COM_LANGUAGES_FTP_DESC'); ?>
 
-		<?php if (JError::isError($ftp)): ?>
+		<?php if ($ftp instanceof Exception) : ?>
 			<p class="warning"><?php echo JText::_($ftp->message); ?></p>
 		<?php endif; ?>
 
 		<div>
 			<label for="username"><?php echo JText::_('JGLOBAL_USERNAME'); ?></label>
-			<input type="text" id="username" name="username" class="inputbox" value="" />
+			<input type="text" id="username" name="username" value="" />
 		</div>
 		<div>
 			<label for="password"><?php echo JText::_('JGLOBAL_PASSWORD'); ?></label>
-			<input type="password" id="password" name="password" class="inputbox" value="" />
+			<input type="password" id="password" name="password" value="" />
 		</div>
 	</fieldset>

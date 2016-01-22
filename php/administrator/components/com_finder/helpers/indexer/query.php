@@ -3,24 +3,23 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('_JEXEC') or die;
 
-// Register dependent classes.
-JLoader::register('FinderIndexerHelper', dirname(__FILE__) . '/helper.php');
-JLoader::register('FinderIndexerTaxonomy', dirname(__FILE__) . '/taxonomy.php');
+use Joomla\Registry\Registry;
+
+JLoader::register('FinderIndexerHelper', __DIR__ . '/helper.php');
+JLoader::register('FinderIndexerTaxonomy', __DIR__ . '/taxonomy.php');
 JLoader::register('FinderHelperRoute', JPATH_SITE . '/components/com_finder/helpers/route.php');
 JLoader::register('FinderHelperLanguage', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/language.php');
 
 /**
  * Query class for the Finder indexer package.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderIndexerQuery
 {
@@ -120,7 +119,7 @@ class FinderIndexerQuery
 	 * $filters = array(
 	 *     'Type' = array(10, 32, 29, 11, ...);
 	 *     'Label' = array(20, 314, 349, 91, 82, ...);
-	 * 		...
+	 *        ...
 	 * );
 	 *
 	 * @var    array
@@ -184,21 +183,24 @@ class FinderIndexerQuery
 		$this->mode = 'AND';
 
 		// Initialize the temporary date storage.
-		$this->dates = new JRegistry;
+		$this->dates = new Registry;
 
 		// Populate the temporary date storage.
 		if (isset($options['date1']) && !empty($options['date1']))
 		{
 			$this->dates->set('date1', $options['date1']);
 		}
+
 		if (isset($options['date2']) && !empty($options['date1']))
 		{
 			$this->dates->set('date2', $options['date2']);
 		}
+
 		if (isset($options['when1']) && !empty($options['date1']))
 		{
 			$this->dates->set('when1', $options['when1']);
 		}
+
 		if (isset($options['when2']) && !empty($options['date1']))
 		{
 			$this->dates->set('when2', $options['when2']);
@@ -269,7 +271,7 @@ class FinderIndexerQuery
 	 *
 	 * @since   2.5
 	 */
-	public function toURI($base = null)
+	public function toUri($base = null)
 	{
 		// Set the base if not specified.
 		if (empty($base))
@@ -278,7 +280,7 @@ class FinderIndexerQuery
 		}
 
 		// Get the base URI.
-		$uri = JURI::getInstance($base);
+		$uri = JUri::getInstance($base);
 
 		// Add the static taxonomy filter if present.
 		if (!empty($this->filter))
@@ -301,6 +303,7 @@ class FinderIndexerQuery
 					{
 						continue;
 					}
+
 					$uri->setVar('t[]', $node);
 				}
 			}
@@ -375,8 +378,7 @@ class FinderIndexerQuery
 		}
 
 		// Sanitize the terms.
-		//@TODO: Should toInteger use $return?
-		$return = array_unique($results);
+		$results = array_unique($results);
 		JArrayHelper::toInteger($results);
 
 		return $results;
@@ -481,27 +483,20 @@ class FinderIndexerQuery
 	protected function processStaticTaxonomy($filterId)
 	{
 		// Get the database object.
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		// Initialize user variables
 		$user = JFactory::getUser();
 		$groups = implode(',', $user->getAuthorisedViewLevels());
 
 		// Load the predefined filter.
-		$query = $db->getQuery(true);
-		$query->select('f.' . $db->quoteName('data') . ', f.' . $db->quoteName('params'));
-		$query->from($db->quoteName('#__finder_filters') . ' AS f');
-		$query->where('f.' . $db->quoteName('filter_id') . ' = ' . (int) $filterId);
+		$query = $db->getQuery(true)
+			->select('f.data, f.params')
+			->from($db->quoteName('#__finder_filters') . ' AS f')
+			->where('f.filter_id = ' . (int) $filterId);
 
 		$db->setQuery($query);
 		$return = $db->loadObject();
-
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
 
 		// Check the returned filter.
 		if (empty($return))
@@ -513,7 +508,7 @@ class FinderIndexerQuery
 		$this->filter = (int) $filterId;
 
 		// Get a parameter object for the filter date options.
-		$registry = new JRegistry;
+		$registry = new Registry;
 		$registry->loadString($return->params);
 		$params = $registry;
 
@@ -545,26 +540,19 @@ class FinderIndexerQuery
 		 * two reasons: one, it allows us to ensure that the filters being used
 		 * are real; two, we need to sort the filters by taxonomy branch.
 		 */
-		$query->clear();
-		$query->select('t1.id, t1.title, t2.title AS branch');
-		$query->from($db->quoteName('#__finder_taxonomy') . ' AS t1');
-		$query->join('INNER', $db->quoteName('#__finder_taxonomy') . ' AS t2 ON t2.id = t1.parent_id');
-		$query->where('t1.state = 1');
-		$query->where('t1.' . $db->quoteName('access') . ' IN (' . $groups . ')');
-		$query->where('t1.id IN (' . implode(',', $filters) . ')');
-		$query->where('t2.state = 1');
-		$query->where('t2.' . $db->quoteName('access') . ' IN (' . $groups . ')');
+		$query->clear()
+			->select('t1.id, t1.title, t2.title AS branch')
+			->from($db->quoteName('#__finder_taxonomy') . ' AS t1')
+			->join('INNER', $db->quoteName('#__finder_taxonomy') . ' AS t2 ON t2.id = t1.parent_id')
+			->where('t1.state = 1')
+			->where('t1.access IN (' . $groups . ')')
+			->where('t1.id IN (' . implode(',', $filters) . ')')
+			->where('t2.state = 1')
+			->where('t2.access IN (' . $groups . ')');
 
 		// Load the filters.
 		$db->setQuery($query);
 		$results = $db->loadObjectList();
-
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
 
 		// Sort the filter ids by branch.
 		foreach ($results as $result)
@@ -612,7 +600,7 @@ class FinderIndexerQuery
 		}
 
 		// Get the database object.
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 
 		/*
@@ -620,25 +608,18 @@ class FinderIndexerQuery
 		 * two reasons: one, it allows us to ensure that the filters being used
 		 * are real; two, we need to sort the filters by taxonomy branch.
 		 */
-		$query->select('t1.id, t1.title, t2.title AS branch');
-		$query->from($db->quoteName('#__finder_taxonomy') . ' AS t1');
-		$query->join('INNER', $db->quoteName('#__finder_taxonomy') . ' AS t2 ON t2.id = t1.parent_id');
-		$query->where('t1.state = 1');
-		$query->where('t1.' . $db->quoteName('access') . ' IN (' . $groups . ')');
-		$query->where('t1.id IN (' . implode(',', $filters) . ')');
-		$query->where('t2.state = 1');
-		$query->where('t2.' . $db->quoteName('access') . ' IN (' . $groups . ')');
+		$query->select('t1.id, t1.title, t2.title AS branch')
+			->from($db->quoteName('#__finder_taxonomy') . ' AS t1')
+			->join('INNER', $db->quoteName('#__finder_taxonomy') . ' AS t2 ON t2.id = t1.parent_id')
+			->where('t1.state = 1')
+			->where('t1.access IN (' . $groups . ')')
+			->where('t1.id IN (' . implode(',', $filters) . ')')
+			->where('t2.state = 1')
+			->where('t2.access IN (' . $groups . ')');
 
 		// Load the filters.
 		$db->setQuery($query);
 		$results = $db->loadObjectList();
-
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
 
 		// Cleared filter branches.
 		$cleared = array();
@@ -693,7 +674,7 @@ class FinderIndexerQuery
 		$when2 = JString::trim(JString::strtolower($when2));
 
 		// Get the time offset.
-		$offset = JFactory::getApplication()->getCfg('offset');
+		$offset = JFactory::getApplication()->get('offset');
 
 		// Array of allowed when values.
 		$whens = array('before', 'after', 'exact');
@@ -712,7 +693,7 @@ class FinderIndexerQuery
 		if ($date->toUnix() !== null)
 		{
 			// Set the date filter.
-			$this->date1 = $date->toSQL();
+			$this->date1 = $date->toSql();
 			$this->when1 = in_array($when1, $whens) ? $when1 : 'before';
 		}
 
@@ -730,7 +711,7 @@ class FinderIndexerQuery
 		if ($date->toUnix() !== null)
 		{
 			// Set the date filter.
-			$this->date2 = $date->toSQL();
+			$this->date2 = $date->toSql();
 			$this->when2 = in_array($when2, $whens) ? $when2 : 'before';
 		}
 
@@ -819,7 +800,7 @@ class FinderIndexerQuery
 					case 'after':
 					{
 						// Get the time offset.
-						$offset = JFactory::getApplication()->getCfg('offset');
+						$offset = JFactory::getApplication()->get('offset');
 
 						// Array of allowed when values.
 						$whens = array('before', 'after', 'exact');
@@ -838,7 +819,7 @@ class FinderIndexerQuery
 						if ($date->toUnix() !== null)
 						{
 							// Set the date filter.
-							$this->date1 = $date->toSQL();
+							$this->date1 = $date->toSql();
 							$this->when1 = in_array($modifier, $whens) ? $modifier : 'before';
 						}
 
@@ -847,7 +828,7 @@ class FinderIndexerQuery
 
 					// Handle a taxonomy branch filter.
 					default:
-					{
+						{
 						// Try to find the node id.
 						$return = FinderIndexerTaxonomy::getNodeByTitle($modifier, $value);
 
@@ -869,7 +850,7 @@ class FinderIndexerQuery
 						}
 
 						break;
-					}
+						}
 				}
 
 				// Clean up the input string again.
@@ -937,10 +918,12 @@ class FinderIndexerQuery
 							// pieces are available to use.
 							switch ($c - $i)
 							{
-								// If only one word is left, we can break from
-								// the switch and loop because the last word
-								// was already used at the end of the last
-								// chunk.
+								/*
+								 * If only one word is left, we can break from
+								 * the switch and loop because the last word
+								 * was already used at the end of the last
+								 * chunk.
+								 */
 								case 1:
 									break 2;
 
@@ -990,12 +973,14 @@ class FinderIndexerQuery
 			'OR' => JString::strtolower(JText::_('COM_FINDER_QUERY_OPERATOR_OR')),
 			'NOT' => JString::strtolower(JText::_('COM_FINDER_QUERY_OPERATOR_NOT'))
 		);
+
 		// If language debugging is enabled you need to ignore the debug strings in matching.
 		if (JDEBUG)
 		{
 			$debugStrings = array('**', '??');
 			$operators = str_replace($debugStrings, '', $operators);
 		}
+
 		/*
 		 * Iterate through the terms and perform any sorting that needs to be
 		 * done based on boolean search operators. Terms that are before an
@@ -1003,7 +988,6 @@ class FinderIndexerQuery
 		 */
 		for ($i = 0, $c = count($terms); $i < $c; $i++)
 		{
-
 			// Check if the term is followed by an operator that we understand.
 			if (isset($terms[$i + 1]) && in_array($terms[$i + 1], $operators))
 			{
@@ -1043,6 +1027,7 @@ class FinderIndexerQuery
 					{
 						unset($phrases[$pk]);
 					}
+
 					if (($pk = array_search($terms[$i + 2], $phrases)) !== false)
 					{
 						unset($phrases[$pk]);
@@ -1104,6 +1089,7 @@ class FinderIndexerQuery
 					{
 						unset($phrases[$pk]);
 					}
+
 					if (($pk = array_search($terms[$i + 2], $phrases)) !== false)
 					{
 						unset($phrases[$pk]);
@@ -1154,7 +1140,7 @@ class FinderIndexerQuery
 				unset($terms[$i + 1]);
 
 				// Adjust the loop.
-				$i += 1;
+				$i++;
 				continue;
 			}
 			// Handle the NOT operator.
@@ -1191,7 +1177,7 @@ class FinderIndexerQuery
 				unset($terms[$i + 1]);
 
 				// Adjust the loop.
-				$i += 1;
+				$i++;
 				continue;
 			}
 		}
@@ -1279,12 +1265,12 @@ class FinderIndexerQuery
 	protected function getTokenData($token)
 	{
 		// Get the database object.
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		// Create a database query to build match the token.
-		$query = $db->getQuery(true);
-		$query->select('t.term, t.term_id');
-		$query->from('#__finder_terms AS t');
+		$query = $db->getQuery(true)
+			->select('t.term, t.term_id')
+			->from('#__finder_terms AS t');
 
 		/*
 		 * If the token is a phrase, the lookup process is fairly simple. If
@@ -1296,38 +1282,28 @@ class FinderIndexerQuery
 		if ($token->phrase)
 		{
 			// Add the phrase to the query.
-			$query->where('t.term = ' . $db->quote($token->term));
-			$query->where('t.phrase = 1');
+			$query->where('t.term = ' . $db->quote($token->term))
+				->where('t.phrase = 1');
 		}
 		else
 		{
 			// Add the term to the query.
-			$query->where('t.term = ' . $db->quote($token->term));
-			$query->where('t.phrase = 0');
+			$query->where('t.term = ' . $db->quote($token->term))
+				->where('t.phrase = 0');
 
 			// Clone the query, replace the WHERE clause.
-			$sub = clone($query);
+			$sub = clone $query;
 			$sub->clear('where');
-			$sub->where('t.stem = '.$db->quote($token->stem));
+			$sub->where('t.stem = ' . $db->quote($token->stem));
 			$sub->where('t.phrase = 0');
 
 			// Union the two queries.
 			$query->union($sub);
-
-//			$query->where('(t.term = ' . $db->quote($token->term) . ' OR t.stem = ' . $db->quote($token->stem) . ')');
-//			$query->where('t.phrase = 0');
 		}
 
 		// Get the terms.
 		$db->setQuery($query);
 		$matches = $db->loadObjectList();
-
-		// Check for a database error.
-		if ($db->getErrorNum())
-		{
-			// Throw database error exception.
-			throw new Exception($db->getErrorMsg(), 500);
-		}
 
 		// Setup the container.
 		$token->matches = array();
@@ -1346,24 +1322,17 @@ class FinderIndexerQuery
 		if (empty($token->matches))
 		{
 			// Create a database query to get the similar terms.
-			//@TODO: PostgreSQL doesn't support SOUNDEX out of the box
-			$query->clear();
-			$query->select('DISTINCT t.term_id AS id, t.term AS term');
-			$query->from('#__finder_terms AS t');
-			//$query->where('t.soundex = ' . soundex($db->quote($token->term)));
-			$query->where('t.soundex = SOUNDEX(' . $db->quote($token->term) . ')');
-			$query->where('t.phrase = ' . (int) $token->phrase);
+			// TODO: PostgreSQL doesn't support SOUNDEX out of the box
+			$query->clear()
+				->select('DISTINCT t.term_id AS id, t.term AS term')
+				->from('#__finder_terms AS t')
+				// ->where('t.soundex = ' . soundex($db->quote($token->term)))
+				->where('t.soundex = SOUNDEX(' . $db->quote($token->term) . ')')
+				->where('t.phrase = ' . (int) $token->phrase);
 
 			// Get the terms.
 			$db->setQuery($query);
 			$results = $db->loadObjectList();
-
-			// Check for a database error.
-			if ($db->getErrorNum())
-			{
-				// Throw database error exception.
-				throw new Exception($db->getErrorMsg(), 500);
-			}
 
 			// Check if any similar terms were found.
 			if (empty($results))

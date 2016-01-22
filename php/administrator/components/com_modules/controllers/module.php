@@ -3,21 +3,16 @@
  * @package     Joomla.Administrator
  * @subpackage  com_modules
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access.
 defined('_JEXEC') or die;
-
-jimport('joomla.application.component.controllerform');
 
 /**
  * Module controller class.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_modules
- * @since       1.6
+ * @since  1.6
  */
 class ModulesControllerModule extends JControllerForm
 {
@@ -30,11 +25,11 @@ class ModulesControllerModule extends JControllerForm
 	 */
 	public function add()
 	{
-		// Initialise variables.
 		$app = JFactory::getApplication();
 
 		// Get the result of the parent method. If an error, just return it.
 		$result = parent::add();
+
 		if ($result instanceof Exception)
 		{
 			return $result;
@@ -42,9 +37,13 @@ class ModulesControllerModule extends JControllerForm
 
 		// Look for the Extension ID.
 		$extensionId = $app->input->get('eid', 0, 'int');
+
 		if (empty($extensionId))
 		{
-			$this->setRedirect(JRoute::_('index.php?option='.$this->option.'&view='.$this->view_item.'&layout=edit', false));
+			$redirectUrl = 'index.php?option=' . $this->option . '&view=' . $this->view_item . '&layout=edit';
+
+			$this->setRedirect(JRoute::_($redirectUrl, false));
+
 			return JError::raiseWarning(500, JText::_('COM_MODULES_ERROR_INVALID_EXTENSION'));
 		}
 
@@ -67,7 +66,6 @@ class ModulesControllerModule extends JControllerForm
 	 */
 	public function cancel($key = null)
 	{
-		// Initialise variables.
 		$app = JFactory::getApplication();
 
 		$result = parent::cancel();
@@ -90,15 +88,45 @@ class ModulesControllerModule extends JControllerForm
 	 */
 	protected function allowSave($data, $key = 'id')
 	{
-		// use custom position if selected
-		if (empty($data['position']))
+		// Use custom position if selected
+		if (isset($data['custom_position']))
 		{
-			$data['position'] = $data['custom_position'];
+			if (empty($data['position']))
+			{
+				$data['position'] = $data['custom_position'];
+			}
+
+			unset($data['custom_position']);
 		}
 
-		unset($data['custom_position']);
-
 		return parent::allowSave($data, $key);
+	}
+
+	/**
+	 * Method override to check if you can edit an existing record.
+	 *
+	 * @param   array   $data  An array of input data.
+	 * @param   string  $key   The name of the key for the primary key.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   3.2
+	 */
+	protected function allowEdit($data = array(), $key = 'id')
+	{
+		// Initialise variables.
+		$recordId = (int) isset($data[$key]) ? $data[$key] : 0;
+		$user = JFactory::getUser();
+		$userId = $user->get('id');
+
+		// Check general edit permission first.
+		if ($user->authorise('core.edit', 'com_modules.module.' . $recordId))
+		{
+			return true;
+		}
+
+		// Since there is no asset tracking, revert to the component permissions.
+		return parent::allowEdit($data, $key);
 	}
 
 	/**
@@ -106,19 +134,21 @@ class ModulesControllerModule extends JControllerForm
 	 *
 	 * @param   string  $model  The model
 	 *
-	 * @return	boolean  True on success.
+	 * @return  boolean  True on success.
 	 *
-	 * @since	1.7
+	 * @since   1.7
 	 */
 	public function batch($model = null)
 	{
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
 		// Set the model
-		$model	= $this->getModel('Module', '', array());
+		$model = $this->getModel('Module', '', array());
 
 		// Preset the redirect
-		$this->setRedirect(JRoute::_('index.php?option=com_modules&view=modules'.$this->getRedirectToListAppend(), false));
+		$redirectUrl = 'index.php?option=com_modules&view=modules' . $this->getRedirectToListAppend();
+
+		$this->setRedirect(JRoute::_($redirectUrl, false));
 
 		return parent::batch($model);
 	}
@@ -126,16 +156,15 @@ class ModulesControllerModule extends JControllerForm
 	/**
 	 * Function that allows child controller access to model data after the data has been saved.
 	 *
-	 * @param   JModel  &$model     The data model object.
-	 * @param   array   $validData  The validated data.
+	 * @param   JModelLegacy  $model      The data model object.
+	 * @param   array         $validData  The validated data.
 	 *
 	 * @return  void
 	 *
 	 * @since   1.6
 	 */
-	protected function postSaveHook(JModel &$model, $validData = array())
+	protected function postSaveHook(JModelLegacy $model, $validData = array())
 	{
-		// Initialise variables.
 		$app = JFactory::getApplication();
 		$task = $this->getTask();
 
@@ -152,4 +181,47 @@ class ModulesControllerModule extends JControllerForm
 
 		$app->setUserState('com_modules.add.module.params', null);
 	}
+
+	/**
+	 * Method to save a record.
+	 *
+	 * @param   string  $key     The name of the primary key of the URL variable.
+	 * @param   string  $urlVar  The name of the URL variable if different from the primary key
+	 *
+	 * @return  boolean  True if successful, false otherwise.
+	 */
+	public function save($key = null, $urlVar = null)
+	{
+		if (!JSession::checkToken())
+		{
+			JFactory::getApplication()->redirect('index.php', JText::_('JINVALID_TOKEN'));
+		}
+
+		if (JFactory::getDocument()->getType() == 'json')
+		{
+			$model = $this->getModel();
+			$data  = $this->input->post->get('jform', array(), 'array');
+			$item = $model->getItem($this->input->get('id'));
+			$properties = $item->getProperties();
+
+			// Replace changed properties
+			$data = array_replace_recursive($properties, $data);
+
+			if (!empty($data['assigned']))
+			{
+				$data['assigned'] = array_map('abs', $data['assigned']);
+			}
+
+			// Add new data to input before process by parent save()
+			$this->input->post->set('jform', $data);
+
+			// Add path of forms directory
+			JForm::addFormPath(JPATH_ADMINISTRATOR . '/components/com_modules/models/forms');
+
+		}
+
+		parent::save($key, $urlVar);
+
+	}
+
 }

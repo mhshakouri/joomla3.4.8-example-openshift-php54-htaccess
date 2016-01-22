@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Log
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -15,25 +15,37 @@ defined('JPATH_PLATFORM') or die;
  * This class is used to be the basis of logger classes to allow for defined functions
  * to exist regardless of the child class.
  *
- * @package     Joomla.Platform
- * @subpackage  Log
- * @since       11.1
+ * @since  12.2
  */
-abstract class JLogger
+abstract class JLogLogger
 {
 	/**
 	 * Options array for the JLog instance.
 	 * @var    array
-	 * @since  11.1
+	 * @since  12.2
 	 */
 	protected $options = array();
+
+	/**
+	 * @var    array  Translation array for JLogEntry priorities to text strings.
+	 * @since  12.2
+	 */
+	protected $priorities = array(
+		JLog::EMERGENCY => 'EMERGENCY',
+		JLog::ALERT => 'ALERT',
+		JLog::CRITICAL => 'CRITICAL',
+		JLog::ERROR => 'ERROR',
+		JLog::WARNING => 'WARNING',
+		JLog::NOTICE => 'NOTICE',
+		JLog::INFO => 'INFO',
+		JLog::DEBUG => 'DEBUG');
 
 	/**
 	 * Constructor.
 	 *
 	 * @param   array  &$options  Log object options.
 	 *
-	 * @since   11.1
+	 * @since   12.2
 	 */
 	public function __construct(array &$options)
 	{
@@ -48,7 +60,31 @@ abstract class JLogger
 	 *
 	 * @return  void
 	 *
-	 * @since   11.1
+	 * @since   12.2
 	 */
 	abstract public function addEntry(JLogEntry $entry);
+}
+
+/**
+ * Deprecated class placeholder.  You should use JLogLogger instead.
+ *
+ * @since       11.1
+ * @deprecated  13.3 (Platform) & 4.0 (CMS)
+ * @codeCoverageIgnore
+ */
+abstract class JLogger extends JLogLogger
+{
+	/**
+	 * Constructor.
+	 *
+	 * @param   array  &$options  Log object options.
+	 *
+	 * @since   11.1
+	 * @deprecated  13.3
+	 */
+	public function __construct(array &$options)
+	{
+		JLog::add('JLogger is deprecated. Use JLogLogger instead.', JLog::WARNING, 'deprecated');
+		parent::__construct($options);
+	}
 }

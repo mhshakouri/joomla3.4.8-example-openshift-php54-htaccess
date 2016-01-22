@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Cache
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -12,24 +12,31 @@ defined('JPATH_PLATFORM') or die;
 /**
  * Joomla Cache output type object
  *
- * @package     Joomla.Platform
- * @subpackage  Cache
- * @since       11.1
+ * @since  11.1
  */
 class JCacheControllerOutput extends JCacheController
 {
 	/**
-	 * @since   11.1
+	 * Cache data ID
+	 *
+	 * @var    string
+	 * @since  11.1
 	 */
 	protected $_id;
 
 	/**
-	 * @since   11.1
+	 * Cache data group
+	 *
+	 * @var    string
+	 * @since  11.1
 	 */
 	protected $_group;
 
 	/**
-	 * @since   11.1
+	 * Object to test locked state
+	 *
+	 * @var    object
+	 * @since  11.1
 	 */
 	protected $_locktest = null;
 
@@ -55,6 +62,7 @@ class JCacheControllerOutput extends JCacheController
 		if ($data === false)
 		{
 			$this->_locktest = $this->cache->lock($id, $group);
+
 			if ($this->_locktest->locked == true && $this->_locktest->locklooped == true)
 			{
 				$data = $this->cache->get($id, $group);
@@ -65,28 +73,29 @@ class JCacheControllerOutput extends JCacheController
 		{
 			$data = unserialize(trim($data));
 			echo $data;
+
 			if ($this->_locktest->locked == true)
 			{
 				$this->cache->unlock($id, $group);
 			}
+
 			return true;
 		}
-		else
+
+		// Nothing in cache... let's start the output buffer and start collecting data for next time.
+		if ($this->_locktest->locked == false)
 		{
-			// Nothing in cache... let's start the output buffer and start collecting data for next time.
-			if ($this->_locktest->locked == false)
-			{
-				$this->_locktest = $this->cache->lock($id, $group);
-			}
-			ob_start();
-			ob_implicit_flush(false);
-
-			// Set id and group placeholders
-			$this->_id = $id;
-			$this->_group = $group;
-
-			return false;
+			$this->_locktest = $this->cache->lock($id, $group);
 		}
+
+		ob_start();
+		ob_implicit_flush(false);
+
+		// Set id and group placeholders
+		$this->_id = $id;
+		$this->_group = $group;
+
+		return false;
 	}
 
 	/**

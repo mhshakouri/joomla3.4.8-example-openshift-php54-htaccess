@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Filter
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -15,50 +15,62 @@ defined('JPATH_PLATFORM') or die;
  * Forked from the php input filter library by: Daniel Morris <dan@rootcube.com>
  * Original Contributors: Gianpaolo Racca, Ghislain Picard, Marco Wandschneider, Chris Tobin and Andrew Eddie.
  *
- * @package     Joomla.Platform
- * @subpackage  Filter
- * @since       11.1
+ * @since  11.1
  */
-class JFilterInput extends JObject
+class JFilterInput
 {
 	/**
-	 * @var    array  A container for JFilterInput instances.
+	 * A container for JFilterInput instances.
+	 *
+	 * @var    array
 	 * @since  11.3
 	 */
 	protected static $instances = array();
 
 	/**
-	 * @var    array  An array of permitted tags.
+	 * The array of permitted tags (white list).
+	 *
+	 * @var    array
 	 * @since  11.1
 	 */
 	public $tagsArray;
 
 	/**
-	 * @var    array  An array of permitted tag attributes.
+	 * The array of permitted tag attributes (white list).
+	 *
+	 * @var    array
 	 * @since  11.1
 	 */
 	public $attrArray;
 
 	/**
-	 * @var    integer  Method for tags: WhiteList method = 0 (default), BlackList method = 1
+	 * The method for sanitising tags: WhiteList method = 0 (default), BlackList method = 1
+	 *
+	 * @var    integer
 	 * @since  11.1
 	 */
 	public $tagsMethod;
 
 	/**
-	 * @var    integer  Method for attributes: WhiteList method = 0 (default), BlackList method = 1
+	 * The method for sanitising attributes: WhiteList method = 0 (default), BlackList method = 1
+	 *
+	 * @var    integer
 	 * @since  11.1
 	 */
 	public $attrMethod;
 
 	/**
-	 * @var    integer  Only auto clean essentials = 0, Allow clean blacklisted tags/attr = 1
+	 * A flag for XSS checks. Only auto clean essentials = 0, Allow clean blacklisted tags/attr = 1
+	 *
+	 * @var    integer
 	 * @since  11.1
 	 */
 	public $xssAuto;
 
 	/**
-	 * @var    array  A list of the default blacklisted tags.
+	 * The list of the default blacklisted tags.
+	 *
+	 * @var    array
 	 * @since  11.1
 	 */
 	public $tagBlacklist = array(
@@ -87,7 +99,9 @@ class JFilterInput extends JObject
 	);
 
 	/**
-	 * @var    array     A list of the default blacklisted tag attributes.  All event handlers implicit.
+	 * The list of the default blacklisted tag attributes. All event handlers implicit.
+	 *
+	 * @var    array
 	 * @since   11.1
 	 */
 	public $attrBlacklist = array(
@@ -153,7 +167,24 @@ class JFilterInput extends JObject
 	 * specified bad code.
 	 *
 	 * @param   mixed   $source  Input string/array-of-string to be 'cleaned'
-	 * @param   string  $type    Return type for the variable (INT, UINT, FLOAT, BOOLEAN, WORD, ALNUM, CMD, BASE64, STRING, ARRAY, PATH, NONE)
+	 * @param   string  $type    The return type for the variable:
+	 *                           INT:       An integer,
+	 *                           UINT:      An unsigned integer,
+	 *                           FLOAT:     A floating point number,
+	 *                           BOOLEAN:   A boolean value,
+	 *                           WORD:      A string containing A-Z or underscores only (not case sensitive),
+	 *                           ALNUM:     A string containing A-Z or 0-9 only (not case sensitive),
+	 *                           CMD:       A string containing A-Z, 0-9, underscores, periods or hyphens (not case sensitive),
+	 *                           BASE64:    A string containing A-Z, 0-9, forward slashes, plus or equals (not case sensitive),
+	 *                           STRING:    A fully decoded and sanitised string (default),
+	 *                           HTML:      A sanitised string,
+	 *                           ARRAY:     An array,
+	 *                           PATH:      A sanitised file path,
+	 *                           TRIM:      A string trimmed from normal, non-breaking and multibyte spaces
+	 *                           USERNAME:  Do not use (use an application specific filter),
+	 *                           RAW:       The raw string is returned with no filtering,
+	 *                           unknown:   An unknown filter will act like STRING. If the input is an array it will return an
+	 *                                      array of fully decoded and sanitised strings.
 	 *
 	 * @return  mixed  'Cleaned' version of input parameter
 	 *
@@ -219,13 +250,23 @@ class JFilterInput extends JObject
 				break;
 
 			case 'PATH':
-				$pattern = '/^[A-Za-z0-9_-]+[A-Za-z0-9_\.-]*([\\\\\/][A-Za-z0-9_-]+[A-Za-z0-9_\.-]*)*$/';
+				$pattern = '/^[A-Za-z0-9_\/-]+[A-Za-z0-9_\.-]*([\\\\\/][A-Za-z0-9_-]+[A-Za-z0-9_\.-]*)*$/';
 				preg_match($pattern, (string) $source, $matches);
 				$result = @ (string) $matches[0];
 				break;
 
+			case 'TRIM':
+				$result = (string) trim($source);
+				$result = JString::trim($result, chr(0xE3) . chr(0x80) . chr(0x80));
+				$result = JString::trim($result, chr(0xC2) . chr(0xA0));
+				break;
+
 			case 'USERNAME':
 				$result = (string) preg_replace('/[\x00-\x1F\x7F<>"\'%&]/', '', $source);
+				break;
+
+			case 'RAW':
+				$result = $source;
 				break;
 
 			default:
@@ -234,12 +275,13 @@ class JFilterInput extends JObject
 				{
 					foreach ($source as $key => $value)
 					{
-						// filter element for XSS and other 'bad' code etc.
+						// Filter element for XSS and other 'bad' code etc.
 						if (is_string($value))
 						{
 							$source[$key] = $this->_remove($this->_decode($value));
 						}
 					}
+
 					$result = $source;
 				}
 				else
@@ -247,7 +289,7 @@ class JFilterInput extends JObject
 					// Or a string?
 					if (is_string($source) && !empty($source))
 					{
-						// filter source for XSS and other 'bad' code etc.
+						// Filter source for XSS and other 'bad' code etc.
 						$result = $this->_remove($this->_decode($source));
 					}
 					else
@@ -279,6 +321,280 @@ class JFilterInput extends JObject
 		return (((strpos($attrSubSet[1], 'expression') !== false) && ($attrSubSet[0]) == 'style') || (strpos($attrSubSet[1], 'javascript:') !== false) ||
 			(strpos($attrSubSet[1], 'behaviour:') !== false) || (strpos($attrSubSet[1], 'vbscript:') !== false) ||
 			(strpos($attrSubSet[1], 'mocha:') !== false) || (strpos($attrSubSet[1], 'livescript:') !== false));
+	}
+
+	/**
+	 * Checks an uploaded for suspicious naming and potential PHP contents which could indicate a hacking attempt.
+	 *
+	 * The options you can define are:
+	 * null_byte                   Prevent files with a null byte in their name (buffer overflow attack)
+	 * forbidden_extensions        Do not allow these strings anywhere in the file's extension
+	 * php_tag_in_content          Do not allow <?php tag in content
+	 * shorttag_in_content         Do not allow short tag <? in content
+	 * shorttag_extensions         Which file extensions to scan for short tags in content
+	 * fobidden_ext_in_content     Do not allow forbidden_extensions anywhere in content
+	 * php_ext_content_extensions  Which file extensions to scan for .php in content
+	 *
+	 * This code is an adaptation and improvement of Admin Tools' UploadShield feature,
+	 * relicensed and contributed by its author.
+	 *
+	 * @param   array  $file     An uploaded file descriptor
+	 * @param   array  $options  The scanner options (see the code for details)
+	 *
+	 * @return  boolean  True of the file is safe
+	 *
+	 * @since   3.4
+	 */
+	public static function isSafeFile($file, $options = array())
+	{
+		$defaultOptions = array(
+			// Null byte in file name
+			'null_byte'                  => true,
+			// Forbidden string in extension (e.g. php matched .php, .xxx.php, .php.xxx and so on)
+			'forbidden_extensions'       => array(
+				'php', 'phps', 'php5', 'php3', 'php4', 'inc', 'pl', 'cgi', 'fcgi', 'java', 'jar', 'py'
+			),
+			// <?php tag in file contents
+			'php_tag_in_content'         => true,
+			// <? tag in file contents
+			'shorttag_in_content'        => true,
+			// Which file extensions to scan for short tags
+			'shorttag_extensions'        => array(
+				'inc', 'phps', 'class', 'php3', 'php4', 'php5', 'txt', 'dat', 'tpl', 'tmpl'
+			),
+			// Forbidden extensions anywhere in the content
+			'fobidden_ext_in_content'    => true,
+			// Which file extensions to scan for .php in the content
+			'php_ext_content_extensions' => array('zip', 'rar', 'tar', 'gz', 'tgz', 'bz2', 'tbz', 'jpa'),
+		);
+
+		$options = array_merge($defaultOptions, $options);
+
+		// Make sure we can scan nested file descriptors
+		$descriptors = $file;
+
+		if (isset($file['name']) && isset($file['tmp_name']))
+		{
+			$descriptors = self::decodeFileData(
+				array(
+					$file['name'],
+					$file['type'],
+					$file['tmp_name'],
+					$file['error'],
+					$file['size']
+				)
+			);
+		}
+
+		// Handle non-nested descriptors (single files)
+		if (isset($descriptors['name']))
+		{
+			$descriptors = array($descriptors);
+		}
+
+		// Scan all descriptors detected
+		foreach ($descriptors as $fileDescriptor)
+		{
+			if (!isset($fileDescriptor['name']))
+			{
+				// This is a nested descriptor. We have to recurse.
+				if (!self::isSafeFile($fileDescriptor, $options))
+				{
+					return false;
+				}
+
+				continue;
+			}
+
+			$tempNames     = $fileDescriptor['tmp_name'];
+			$intendedNames = $fileDescriptor['name'];
+
+			if (!is_array($tempNames))
+			{
+				$tempNames = array($tempNames);
+			}
+
+			if (!is_array($intendedNames))
+			{
+				$intendedNames = array($intendedNames);
+			}
+
+			$len = count($tempNames);
+
+			for ($i = 0; $i < $len; $i++)
+			{
+				$tempName     = array_shift($tempNames);
+				$intendedName = array_shift($intendedNames);
+
+				// 1. Null byte check
+				if ($options['null_byte'])
+				{
+					if (strstr($intendedName, "\x00"))
+					{
+						return false;
+					}
+				}
+
+				// 2. PHP-in-extension check (.php, .php.xxx[.yyy[.zzz[...]]], .xxx[.yyy[.zzz[...]]].php)
+				if (!empty($options['forbidden_extensions']))
+				{
+					$explodedName = explode('.', $intendedName);
+					$explodedName =	array_reverse($explodedName);
+					array_pop($explodedName);
+					$explodedName = array_map('strtolower', $explodedName);
+
+					/*
+					 * DO NOT USE array_intersect HERE! array_intersect expects the two arrays to
+					 * be set, i.e. they should have unique values.
+					 */
+					foreach ($options['forbidden_extensions'] as $ext)
+					{
+						if (in_array($ext, $explodedName))
+						{
+							return false;
+						}
+					}
+				}
+
+				// 3. File contents scanner (PHP tag in file contents)
+				if ($options['php_tag_in_content'] || $options['shorttag_in_content']
+					|| ($options['fobidden_ext_in_content'] && !empty($options['forbidden_extensions'])))
+				{
+					$fp = @fopen($tempName, 'r');
+
+					if ($fp !== false)
+					{
+						$data = '';
+
+						while (!feof($fp))
+						{
+							$data .= @fread($fp, 131072);
+
+							if ($options['php_tag_in_content'] && stristr($data, '<?php'))
+							{
+								return false;
+							}
+
+							if ($options['shorttag_in_content'])
+							{
+								$suspiciousExtensions = $options['shorttag_extensions'];
+
+								if (empty($suspiciousExtensions))
+								{
+									$suspiciousExtensions = array(
+										'inc', 'phps', 'class', 'php3', 'php4', 'txt', 'dat', 'tpl', 'tmpl'
+									);
+								}
+
+								/*
+								 * DO NOT USE array_intersect HERE! array_intersect expects the two arrays to
+								 * be set, i.e. they should have unique values.
+								 */
+								$collide = false;
+
+								foreach ($suspiciousExtensions as $ext)
+								{
+									if (in_array($ext, $explodedName))
+									{
+										$collide = true;
+
+										break;
+									}
+								}
+
+								if ($collide)
+								{
+									// These are suspicious text files which may have the short tag (<?) in them
+									if (strstr($data, '<?'))
+									{
+										return false;
+									}
+								}
+							}
+
+							if ($options['fobidden_ext_in_content'] && !empty($options['forbidden_extensions']))
+							{
+								$suspiciousExtensions = $options['php_ext_content_extensions'];
+
+								if (empty($suspiciousExtensions))
+								{
+									$suspiciousExtensions = array(
+										'zip', 'rar', 'tar', 'gz', 'tgz', 'bz2', 'tbz', 'jpa'
+									);
+								}
+
+								/*
+								 * DO NOT USE array_intersect HERE! array_intersect expects the two arrays to
+								 * be set, i.e. they should have unique values.
+								 */
+								$collide = false;
+
+								foreach ($suspiciousExtensions as $ext)
+								{
+									if (in_array($ext, $explodedName))
+									{
+										$collide = true;
+
+										break;
+									}
+								}
+
+								if ($collide)
+								{
+									/*
+									 * These are suspicious text files which may have an executable
+									 * file extension in them
+									 */
+									foreach ($options['forbidden_extensions'] as $ext)
+									{
+										if (strstr($data, '.' . $ext))
+										{
+											return false;
+										}
+									}
+								}
+							}
+
+							/*
+							 * This makes sure that we don't accidentally skip a <?php tag if it's across
+							 * a read boundary, even on multibyte strings
+							 */
+							$data = substr($data, -10);
+						}
+
+						fclose($fp);
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Method to decode a file data array.
+	 *
+	 * @param   array  $data  The data array to decode.
+	 *
+	 * @return  array
+	 *
+	 * @since   3.4
+	 */
+	protected static function decodeFileData(array $data)
+	{
+		$result = array();
+
+		if (is_array($data[0]))
+		{
+			foreach ($data[0] as $k => $v)
+			{
+				$result[$k] = self::decodeFileData(array($data[0][$k], $data[1][$k], $data[2][$k], $data[3][$k], $data[4][$k]));
+			}
+
+			return $result;
+		}
+
+		return array('name' => $data[0], 'type' => $data[1], 'tmp_name' => $data[2], 'error' => $data[3], 'size' => $data[4]);
 	}
 
 	/**
@@ -317,10 +633,12 @@ class JFilterInput extends JObject
 	{
 		// First, pre-process this for illegal characters inside attribute values
 		$source = $this->_escapeAttributeValues($source);
+
 		// In the beginning we don't really have a tag, so everything is postTag
 		$preTag = null;
 		$postTag = $source;
 		$currentSpace = false;
+
 		// Setting to null to deal with undefined variables
 		$attr = '';
 
@@ -337,6 +655,7 @@ class JFilterInput extends JObject
 
 			// Check for mal-formed tag where we have a second '<' before the first '>'
 			$nextOpenTag = (strlen($postTag) > $tagOpen_start) ? strpos($postTag, '<', $tagOpen_start + 1) : false;
+
 			if (($nextOpenTag !== false) && ($nextOpenTag < $tagOpen_end))
 			{
 				// At this point we have a mal-formed tag -- remove the offending open
@@ -355,7 +674,7 @@ class JFilterInput extends JObject
 
 			// Do we have a nested tag?
 			$tagOpen_nested = strpos($fromTagOpen, '<');
-			$tagOpen_nested_end = strpos(substr($postTag, $tagOpen_end), '>');
+
 			if (($tagOpen_nested !== false) && ($tagOpen_nested < $tagOpen_end))
 			{
 				$preTag .= substr($postTag, 0, ($tagOpen_nested + 1));
@@ -396,6 +715,7 @@ class JFilterInput extends JObject
 			{
 				$postTag = substr($postTag, ($tagLength + 2));
 				$tagOpen_start = strpos($postTag, '<');
+
 				// Strip tag
 				continue;
 			}
@@ -444,6 +764,7 @@ class JFilterInput extends JObject
 						$fromSpace = substr($fromSpace, $attribEnd + 1);
 					}
 				}
+
 				if (strpos($fromSpace, '=') !== false)
 				{
 					// If the attribute value is wrapped in quotes we need to grab the substring from
@@ -492,6 +813,7 @@ class JFilterInput extends JObject
 					// Open or single tag
 					$attrSet = $this->_cleanAttributes($attrSet);
 					$preTag .= '<' . $tagName;
+
 					for ($i = 0, $count = count($attrSet); $i < $count; $i++)
 					{
 						$preTag .= ' ' . $attrSet[$i];
@@ -539,10 +861,10 @@ class JFilterInput extends JObject
 	 */
 	protected function _cleanAttributes($attrSet)
 	{
-		// Initialise variables.
 		$newSet = array();
 
 		$count = count($attrSet);
+
 		// Iterate through attribute pairs
 		for ($i = 0; $i < $count; $i++)
 		{
@@ -554,8 +876,10 @@ class JFilterInput extends JObject
 
 			// Split into name/value pairs
 			$attrSubSet = explode('=', trim($attrSet[$i]), 2);
+
 			// Take the last attribute in case there is an attribute with no value
-			$attrSubSet[0] = array_pop(explode(' ', trim($attrSubSet[0])));
+			$attrSubSet_0 = explode(' ', trim($attrSubSet[0]));
+			$attrSubSet[0] = array_pop($attrSubSet_0);
 
 			// Remove all "non-regular" attribute names
 			// AND blacklisted attributes
@@ -570,14 +894,18 @@ class JFilterInput extends JObject
 			// XSS attribute value filtering
 			if (isset($attrSubSet[1]))
 			{
-				// trim leading and trailing spaces
+				// Trim leading and trailing spaces
 				$attrSubSet[1] = trim($attrSubSet[1]);
-				// strips unicode, hex, etc
+
+				// Strips unicode, hex, etc
 				$attrSubSet[1] = str_replace('&#', '', $attrSubSet[1]);
+
 				// Strip normal newline within attr value
 				$attrSubSet[1] = preg_replace('/[\n\r]/', '', $attrSubSet[1]);
+
 				// Strip double quotes
 				$attrSubSet[1] = str_replace('"', '', $attrSubSet[1]);
+
 				// Convert single quotes from either side to doubles (Single quotes shouldn't be used to pad attr values)
 				if ((substr($attrSubSet[1], 0, 1) == "'") && (substr($attrSubSet[1], (strlen($attrSubSet[1]) - 1), 1) == "'"))
 				{
@@ -641,17 +969,30 @@ class JFilterInput extends JObject
 		if (!is_array($ttr))
 		{
 			// Entity decode
-			$trans_tbl = get_html_translation_table(HTML_ENTITIES);
+			$trans_tbl = get_html_translation_table(HTML_ENTITIES, ENT_COMPAT, 'ISO-8859-1');
+
 			foreach ($trans_tbl as $k => $v)
 			{
 				$ttr[$v] = utf8_encode($k);
 			}
 		}
+
 		$source = strtr($source, $ttr);
+
 		// Convert decimal
-		$source = preg_replace('/&#(\d+);/me', "utf8_encode(chr(\\1))", $source); // decimal notation
+		$source = preg_replace_callback('/&#(\d+);/m', function($m)
+		{
+			return utf8_encode(chr($m[1]));
+		}, $source
+		);
+
 		// Convert hex
-		$source = preg_replace('/&#x([a-f0-9]+);/mei', "utf8_encode(chr(0x\\1))", $source); // hex notation
+		$source = preg_replace_callback('/&#x([a-f0-9]+);/mi', function($m)
+		{
+			return utf8_encode(chr('0x' . $m[1]));
+		}, $source
+		);
+
 		return $source;
 	}
 
@@ -670,11 +1011,12 @@ class JFilterInput extends JObject
 		$remainder = $source;
 		$badChars = array('<', '"', '>');
 		$escapedChars = array('&lt;', '&quot;', '&gt;');
+
 		// Process each portion based on presence of =" and "<space>, "/>, or ">
 		// See if there are any more attributes to process
 		while (preg_match('#<[^>]*?=\s*?(\"|\')#s', $remainder, $matches, PREG_OFFSET_CAPTURE))
 		{
-			// get the portion before the attribute value
+			// Get the portion before the attribute value
 			$quotePosition = $matches[0][1];
 			$nextBefore = $quotePosition + strlen($matches[0][0]);
 
@@ -683,7 +1025,7 @@ class JFilterInput extends JObject
 			$quote = substr($matches[0][0], -1);
 			$pregMatch = ($quote == '"') ? '#(\"\s*/\s*>|\"\s*>|\"\s+|\"$)#' : "#(\'\s*/\s*>|\'\s*>|\'\s+|\'$)#";
 
-			// get the portion after attribute value
+			// Get the portion after attribute value
 			if (preg_match($pregMatch, substr($remainder, $nextBefore), $matches, PREG_OFFSET_CAPTURE))
 			{
 				// We have a closing quote
@@ -694,8 +1036,10 @@ class JFilterInput extends JObject
 				// No closing quote
 				$nextAfter = strlen($remainder);
 			}
+
 			// Get the actual attribute value
 			$attributeValue = substr($remainder, $nextBefore, $nextAfter - $nextBefore);
+
 			// Escape bad chars
 			$attributeValue = str_replace($badChars, $escapedChars, $attributeValue);
 			$attributeValue = $this->_stripCSSExpressions($attributeValue);
@@ -720,6 +1064,7 @@ class JFilterInput extends JObject
 	{
 		// Strip any comments out (in the form of /*...*/)
 		$test = preg_replace('#\/\*.*\*\/#U', '', $source);
+
 		// Test for :expression
 		if (!stripos($test, ':expression'))
 		{
@@ -737,6 +1082,7 @@ class JFilterInput extends JObject
 				$return = $test;
 			}
 		}
+
 		return $return;
 	}
 }

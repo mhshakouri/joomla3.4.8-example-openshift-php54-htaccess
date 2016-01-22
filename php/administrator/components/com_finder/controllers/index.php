@@ -3,20 +3,16 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.controlleradmin');
-
 /**
  * Index controller class for Finder.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderControllerIndex extends JControllerAdmin
 {
@@ -34,6 +30,7 @@ class FinderControllerIndex extends JControllerAdmin
 	public function getModel($name = 'Index', $prefix = 'FinderModel', $config = array('ignore_request' => true))
 	{
 		$model = parent::getModel($name, $prefix, $config);
+
 		return $model;
 	}
 
@@ -51,7 +48,6 @@ class FinderControllerIndex extends JControllerAdmin
 		// Remove the script time limit.
 		@set_time_limit(0);
 
-		// Initialize variables.
 		$model = $this->getModel('Index', 'FinderModel');
 
 		// Attempt to purge the index.
@@ -61,12 +57,14 @@ class FinderControllerIndex extends JControllerAdmin
 		{
 			$message = JText::_('COM_FINDER_INDEX_PURGE_FAILED', $model->getError());
 			$this->setRedirect('index.php?option=com_finder&view=index', $message);
+
 			return false;
 		}
 		else
 		{
 			$message = JText::_('COM_FINDER_INDEX_PURGE_SUCCESS');
 			$this->setRedirect('index.php?option=com_finder&view=index', $message);
+
 			return true;
 		}
 	}

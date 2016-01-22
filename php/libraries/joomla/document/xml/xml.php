@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Document
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -12,9 +12,7 @@ defined('JPATH_PLATFORM') or die;
 /**
  * DocumentXML class, provides an easy interface to parse and display XML output
  *
- * @package     Joomla.Platform
- * @subpackage  Document
- * @since       11.1
+ * @since  11.1
  */
 class JDocumentXml extends JDocument
 {
@@ -22,9 +20,9 @@ class JDocumentXml extends JDocument
 	 * Document name
 	 *
 	 * @var    string
-	 * @since  11.1
+	 * @since  12.1
 	 */
-	protected $_name = 'joomla';
+	protected $name = 'joomla';
 
 	/**
 	 * Class constructor
@@ -37,10 +35,10 @@ class JDocumentXml extends JDocument
 	{
 		parent::__construct($options);
 
-		//set mime type
+		// Set mime type
 		$this->_mime = 'application/xml';
 
-		//set document type
+		// Set document type
 		$this->_type = 'xml';
 	}
 
@@ -57,7 +55,8 @@ class JDocumentXml extends JDocument
 	public function render($cache = false, $params = array())
 	{
 		parent::render();
-		JResponse::setHeader('Content-disposition', 'inline; filename="' . $this->getName() . '.xml"', true);
+
+		JFactory::getApplication()->setHeader('Content-disposition', 'inline; filename="' . $this->getName() . '.xml"', true);
 
 		return $this->getBuffer();
 	}
@@ -71,7 +70,7 @@ class JDocumentXml extends JDocument
 	 */
 	public function getName()
 	{
-		return $this->_name;
+		return $this->name;
 	}
 
 	/**
@@ -85,7 +84,7 @@ class JDocumentXml extends JDocument
 	 */
 	public function setName($name = 'joomla')
 	{
-		$this->_name = $name;
+		$this->name = $name;
 
 		return $this;
 	}

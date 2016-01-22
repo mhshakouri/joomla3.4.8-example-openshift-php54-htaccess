@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Utilities
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -15,9 +15,7 @@ defined('JPATH_PLATFORM') or die;
  * This class provides a generic buffer stream.  It can be used to store/retrieve/manipulate
  * string buffers with the standard PHP filesystem I/O methods.
  *
- * @package     Joomla.Platform
- * @subpackage  Utilities
- * @since       11.1
+ * @since  11.1
  */
 class JBuffer
 {
@@ -41,9 +39,9 @@ class JBuffer
 	 * Buffer hash
 	 *
 	 * @var    array
-	 * @since  11.1
+	 * @since  12.1
 	 */
-	public $_buffers = array();
+	public $buffers = array();
 
 	/**
 	 * Function to open file or url
@@ -62,8 +60,8 @@ class JBuffer
 	public function stream_open($path, $mode, $options, &$opened_path)
 	{
 		$url = parse_url($path);
-		$this->name = $url["host"];
-		$this->_buffers[$this->name] = null;
+		$this->name = $url['host'];
+		$this->buffers[$this->name] = null;
 		$this->position = 0;
 
 		return true;
@@ -83,7 +81,7 @@ class JBuffer
 	 */
 	public function stream_read($count)
 	{
-		$ret = substr($this->_buffers[$this->name], $this->position, $count);
+		$ret = substr($this->buffers[$this->name], $this->position, $count);
 		$this->position += strlen($ret);
 
 		return $ret;
@@ -101,9 +99,9 @@ class JBuffer
 	 */
 	public function stream_write($data)
 	{
-		$left = substr($this->_buffers[$this->name], 0, $this->position);
-		$right = substr($this->_buffers[$this->name], $this->position + strlen($data));
-		$this->_buffers[$this->name] = $left . $data . $right;
+		$left = substr($this->buffers[$this->name], 0, $this->position);
+		$right = substr($this->buffers[$this->name], $this->position + strlen($data));
+		$this->buffers[$this->name] = $left . $data . $right;
 		$this->position += strlen($data);
 
 		return strlen($data);
@@ -132,7 +130,7 @@ class JBuffer
 	 */
 	public function stream_eof()
 	{
-		return $this->position >= strlen($this->_buffers[$this->name]);
+		return $this->position >= strlen($this->buffers[$this->name]);
 	}
 
 	/**
@@ -152,9 +150,10 @@ class JBuffer
 		switch ($whence)
 		{
 			case SEEK_SET:
-				if ($offset < strlen($this->_buffers[$this->name]) && $offset >= 0)
+				if ($offset < strlen($this->buffers[$this->name]) && $offset >= 0)
 				{
 					$this->position = $offset;
+
 					return true;
 				}
 				else
@@ -167,6 +166,7 @@ class JBuffer
 				if ($offset >= 0)
 				{
 					$this->position += $offset;
+
 					return true;
 				}
 				else
@@ -176,9 +176,10 @@ class JBuffer
 				break;
 
 			case SEEK_END:
-				if (strlen($this->_buffers[$this->name]) + $offset >= 0)
+				if (strlen($this->buffers[$this->name]) + $offset >= 0)
 				{
-					$this->position = strlen($this->_buffers[$this->name]) + $offset;
+					$this->position = strlen($this->buffers[$this->name]) + $offset;
+
 					return true;
 				}
 				else
@@ -193,4 +194,4 @@ class JBuffer
 	}
 }
 // Register the stream
-stream_wrapper_register("buffer", "JBuffer");
+stream_wrapper_register('buffer', 'JBuffer');

@@ -3,7 +3,7 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -14,9 +14,7 @@ JLoader::register('FinderHelperLanguage', JPATH_ADMINISTRATOR . '/components/com
 /**
  * Index view class for Finder.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderViewIndex extends JViewLegacy
 {
@@ -34,17 +32,19 @@ class FinderViewIndex extends JViewLegacy
 		// Load plug-in language files.
 		FinderHelperLanguage::loadPluginLanguage();
 
-		// Initialise variables
-		$this->items		= $this->get('Items');
-		$this->total		= $this->get('Total');
-		$this->pagination	= $this->get('Pagination');
-		$this->state		= $this->get('State');
-		$this->pluginState  = $this->get('pluginState');
+		$this->items       = $this->get('Items');
+		$this->total       = $this->get('Total');
+		$this->pagination  = $this->get('Pagination');
+		$this->state       = $this->get('State');
+		$this->pluginState = $this->get('pluginState');
+
+		FinderHelper::addSubmenu('index');
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode("\n", $errors));
+
 			return false;
 		}
 
@@ -52,7 +52,7 @@ class FinderViewIndex extends JViewLegacy
 
 		// Configure the toolbar.
 		$this->addToolbar();
-
+		$this->sidebar = JHtmlSidebar::render();
 		parent::display($tpl);
 	}
 
@@ -65,38 +65,53 @@ class FinderViewIndex extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
-		$canDo	= FinderHelper::getActions();
+		$canDo = JHelperContent::getActions('com_finder');
 
-		JToolBarHelper::title(JText::_('COM_FINDER_INDEX_TOOLBAR_TITLE'), 'finder');
-		$toolbar = JToolBar::getInstance('toolbar');
+		JToolbarHelper::title(JText::_('COM_FINDER_INDEX_TOOLBAR_TITLE'), 'zoom-in finder');
 
-		$toolbar->appendButton('Popup', 'archive', 'COM_FINDER_INDEX', 'index.php?option=com_finder&view=indexer&tmpl=component', 500, 210);
-		JToolBarHelper::divider();
+		$toolbar = JToolbar::getInstance('toolbar');
+		$toolbar->appendButton(
+			'Popup', 'archive', 'COM_FINDER_INDEX', 'index.php?option=com_finder&view=indexer&tmpl=component', 500, 210, 0, 0,
+			'window.parent.location.reload()', 'COM_FINDER_HEADING_INDEXER'
+		);
 
 		if ($canDo->get('core.edit.state'))
 		{
-			JToolBarHelper::publishList('index.publish');
-			JToolBarHelper::unpublishList('index.unpublish');
-			JToolBarHelper::divider();
+			JToolbarHelper::publishList('index.publish');
+			JToolbarHelper::unpublishList('index.unpublish');
 		}
+
+		if ($canDo->get('core.admin') || $canDo->get('core.options'))
+		{
+			JToolbarHelper::preferences('com_finder');
+		}
+
+		$toolbar->appendButton('Popup', 'bars', 'COM_FINDER_STATISTICS', 'index.php?option=com_finder&view=statistics&tmpl=component', 550, 350);
+
 		if ($canDo->get('core.delete'))
 		{
-			JToolBarHelper::deleteList('', 'index.delete');
-			JToolBarHelper::divider();
-		}
-		if ($canDo->get('core.edit.state'))
-		{
-			JToolBarHelper::trash('index.purge', 'COM_FINDER_INDEX_TOOLBAR_PURGE', false);
-			JToolBarHelper::divider();
+			JToolbarHelper::deleteList('', 'index.delete');
 		}
 
-		if ($canDo->get('core.admin'))
+		if ($canDo->get('core.edit.state'))
 		{
-			JToolBarHelper::preferences('com_finder');
+			JToolbarHelper::trash('index.purge', 'COM_FINDER_INDEX_TOOLBAR_PURGE', false);
 		}
-		JToolBarHelper::divider();
-		$toolbar->appendButton('Popup', 'stats', 'COM_FINDER_STATISTICS', 'index.php?option=com_finder&view=statistics&tmpl=component', 550, 500);
-		JToolBarHelper::divider();
-		JToolBarHelper::help('JHELP_COMPONENTS_FINDER_MANAGE_INDEXED_CONTENT');
+
+		JToolbarHelper::help('JHELP_COMPONENTS_FINDER_MANAGE_INDEXED_CONTENT');
+
+		JHtmlSidebar::setAction('index.php?option=com_finder&view=index');
+
+		JHtmlSidebar::addFilter(
+			JText::_('COM_FINDER_INDEX_FILTER_BY_STATE'),
+			'filter_state',
+			JHtml::_('select.options', JHtml::_('finder.statelist'), 'value', 'text', $this->state->get('filter.state'))
+		);
+
+		JHtmlSidebar::addFilter(
+			JText::_('COM_FINDER_INDEX_TYPE_FILTER'),
+			'filter_type',
+			JHtml::_('select.options', JHtml::_('finder.typeslist'), 'value', 'text', $this->state->get('filter.type'))
+		);
 	}
 }

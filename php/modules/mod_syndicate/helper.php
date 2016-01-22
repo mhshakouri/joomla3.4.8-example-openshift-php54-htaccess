@@ -1,27 +1,44 @@
 <?php
 /**
- * @package		Joomla.Site
- * @subpackage	mod_syndicate
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Site
+ * @subpackage  mod_syndicate
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// no direct access
 defined('_JEXEC') or die;
 
-class modSyndicateHelper
+/**
+ * Helper for mod_syndicate
+ *
+ * @package     Joomla.Site
+ * @subpackage  mod_syndicate
+ * @since       1.5
+ */
+class ModSyndicateHelper
 {
-	static function getLink(&$params)
+	/**
+	 * Gets the link
+	 * 
+	 * @param   \Joomla\Registry\Registry  &$params  module parameters
+	 * 
+	 * @return  array  The link as a string
+	 * 
+	 * @since   1.5
+	 */
+	public static function getLink(&$params)
 	{
 		$document = JFactory::getDocument();
 
-		foreach($document->_links as $link => $value)
+		foreach ($document->_links as $link => $value)
 		{
 			$value = JArrayHelper::toString($value);
-			if (strpos($value, 'application/'.$params->get('format').'+xml')) {
+
+			if (strpos($value, 'application/' . $params->get('format') . '+xml'))
+			{
 				return $link;
 			}
 		}
-
 	}
 }

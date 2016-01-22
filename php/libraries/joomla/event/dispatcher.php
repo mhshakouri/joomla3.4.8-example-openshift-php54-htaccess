@@ -3,7 +3,7 @@
  * @package     Joomla.Platform
  * @subpackage  Event
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -15,13 +15,11 @@ defined('JPATH_PLATFORM') or die;
  * This is the Observable part of the Observer design pattern
  * for the event architecture.
  *
- * @package     Joomla.Platform
- * @subpackage  Event
- * @link        http://docs.joomla.org/Tutorial:Plugins Plugin tutorials
- * @see         JPlugin
- * @since       11.1
+ * @link   https://docs.joomla.org/Tutorial:Plugins Plugin tutorials
+ * @see    JPlugin
+ * @since  12.1
  */
-class JDispatcher extends JObject
+class JEventDispatcher extends JObject
 {
 	/**
 	 * An array of Observer objects to notify
@@ -50,7 +48,7 @@ class JDispatcher extends JObject
 	/**
 	 * Stores the singleton instance of the dispatcher.
 	 *
-	 * @var    JDispatcher
+	 * @var    JEventDispatcher
 	 * @since  11.3
 	 */
 	protected static $instance = null;
@@ -59,7 +57,7 @@ class JDispatcher extends JObject
 	 * Returns the global Event Dispatcher object, only creating it
 	 * if it doesn't already exist.
 	 *
-	 * @return  JDispatcher  The EventDispatcher object.
+	 * @return  JEventDispatcher  The EventDispatcher object.
 	 *
 	 * @since   11.1
 	 */
@@ -67,14 +65,14 @@ class JDispatcher extends JObject
 	{
 		if (self::$instance === null)
 		{
-			self::$instance = new JDispatcher;
+			self::$instance = new static;
 		}
 
 		return self::$instance;
 	}
 
 	/**
-	 * Get the state of the JDispatcher object
+	 * Get the state of the JEventDispatcher object
 	 *
 	 * @return  mixed    The state of the object.
 	 *
@@ -94,11 +92,12 @@ class JDispatcher extends JObject
 	 * @return  void
 	 *
 	 * @since   11.1
+	 * @throws  InvalidArgumentException
 	 */
 	public function register($event, $handler)
 	{
-		// Are we dealing with a class or function type handler?
-		if (function_exists($handler))
+		// Are we dealing with a class or callback type handler?
+		if (is_callable($handler))
 		{
 			// Ok, function type event handler... let's attach it.
 			$method = array('event' => $event, 'handler' => $handler);
@@ -111,7 +110,7 @@ class JDispatcher extends JObject
 		}
 		else
 		{
-			return JError::raiseWarning('SOME_ERROR_CODE', JText::sprintf('JLIB_EVENT_ERROR_DISPATCHER', $handler));
+			throw new InvalidArgumentException('Invalid event handler.');
 		}
 	}
 
@@ -128,7 +127,6 @@ class JDispatcher extends JObject
 	 */
 	public function trigger($event, $args = array())
 	{
-		// Initialise variables.
 		$result = array();
 
 		/*
@@ -145,6 +143,7 @@ class JDispatcher extends JObject
 			// No Plugins Associated To Event!
 			return $result;
 		}
+
 		// Loop through all plugins having a method matching our event
 		foreach ($this->_methods[$event] as $key)
 		{
@@ -165,6 +164,7 @@ class JDispatcher extends JObject
 			{
 				$value = call_user_func_array($this->_observers[$key]['handler'], $args);
 			}
+
 			if (isset($value))
 			{
 				$result[] = $value;
@@ -202,7 +202,6 @@ class JDispatcher extends JObject
 			}
 
 			$this->_observers[] = $observer;
-			end($this->_observers);
 			$methods = array($observer['event']);
 		}
 		else
@@ -227,6 +226,7 @@ class JDispatcher extends JObject
 			$methods = array_diff(get_class_methods($observer), get_class_methods('JPlugin'));
 		}
 
+		end($this->_observers);
 		$key = key($this->_observers);
 
 		foreach ($methods as $method)
@@ -253,7 +253,6 @@ class JDispatcher extends JObject
 	 */
 	public function detach($observer)
 	{
-		// Initialise variables.
 		$retval = false;
 
 		$key = array_search($observer, $this->_observers);

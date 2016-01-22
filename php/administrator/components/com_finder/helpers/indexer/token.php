@@ -3,7 +3,7 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -12,9 +12,7 @@ defined('_JEXEC') or die;
 /**
  * Token class for the Finder indexer package.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderIndexerToken
 {
@@ -80,6 +78,14 @@ class FinderIndexerToken
 	public $weight;
 
 	/**
+	 * The simple language identifier for the token.
+	 *
+	 * @var    string
+	 * @since  2.5
+	 */
+	public $language;
+
+	/**
 	 * Method to construct the token object.
 	 *
 	 * @param   mixed   $term    The term as a string for words or an array for phrases.
@@ -90,6 +96,8 @@ class FinderIndexerToken
 	 */
 	public function __construct($term, $lang, $spacer = ' ')
 	{
+		$this->language = $lang;
+
 		// Tokens can be a single word or an array of words representing a phrase.
 		if (is_array($term))
 		{

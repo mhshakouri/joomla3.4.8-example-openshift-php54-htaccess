@@ -1,9 +1,10 @@
 <?php
 /**
- * @package		Joomla.Administrator
- * @subpackage	com_modules
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Administrator
+ * @subpackage  com_modules
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -11,18 +12,22 @@ defined('_JEXEC') or die;
 /**
  * HTML View class for the Modules component
  *
- * @static
- * @package		Joomla.Administrator
- * @subpackage	com_modules
- * @since 1.6
+ * @since  1.6
  */
 class ModulesViewPreview extends JViewLegacy
 {
-	function display($tpl = null)
+	/**
+	 * Display the view
+	 *
+	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
+	 *
+	 * @return  void
+	 */
+	public function display($tpl = null)
 	{
-		$editor = JFactory::getEditor();
+		$editor = JFactory::getConfig()->get('editor');
 
-		$this->assignRef('editor',		$editor);
+		$this->editor = JEditor::getInstance($editor);
 
 		parent::display($tpl);
 	}

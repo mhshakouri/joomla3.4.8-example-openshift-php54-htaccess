@@ -3,8 +3,8 @@
  * @package     Joomla.Site
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -14,9 +14,7 @@ JLoader::register('FinderHelperLanguage', JPATH_ADMINISTRATOR . '/components/com
 /**
  * Finder Component Controller.
  *
- * @package     Joomla.Site
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderController extends JControllerLegacy
 {
@@ -27,13 +25,12 @@ class FinderController extends JControllerLegacy
 	 * @param   array    $urlparams  An array of safe url parameters and their variable types,
 	 *                               for valid values see {@link JFilterInput::clean()}. [optional]
 	 *
-	 * @return  JController  This object is to support chaining.
+	 * @return  JControllerLegacy  This object is to support chaining.
 	 *
-	 * @since   1.6
+	 * @since   2.5
 	 */
 	public function display($cachable = false, $urlparams = array())
 	{
-		// Initialise variables.
 		$input = JFactory::getApplication()->input;
 		$cachable = true;
 
@@ -45,13 +42,14 @@ class FinderController extends JControllerLegacy
 		$input->set('view', $viewName);
 
 		// Don't cache view for search queries
-		if ($input->get('q') || $input->get('f') || $input->get('t')) {
- 			$cachable = false;
- 		}
+		if ($input->get('q', null, 'string') || $input->get('f', null, 'int') || $input->get('t', null, 'array'))
+		{
+			$cachable = false;
+		}
 
 		$safeurlparams = array(
-			'f' 	=> 'INT',
-			'lang' 	=> 'CMD'
+			'f'    => 'INT',
+			'lang' => 'CMD'
 		);
 
 		return parent::display($cachable, $safeurlparams);

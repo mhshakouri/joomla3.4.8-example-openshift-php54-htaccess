@@ -3,7 +3,7 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
@@ -14,9 +14,7 @@ JLoader::register('FinderHelperLanguage', JPATH_ADMINISTRATOR . '/components/com
 /**
  * Groups view class for Finder.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderViewMaps extends JViewLegacy
 {
@@ -35,22 +33,26 @@ class FinderViewMaps extends JViewLegacy
 		FinderHelperLanguage::loadPluginLanguage();
 
 		// Load the view data.
-		$this->items		= $this->get('Items');
-		$this->total		= $this->get('Total');
-		$this->pagination	= $this->get('Pagination');
-		$this->state		= $this->get('State');
+		$this->items      = $this->get('Items');
+		$this->total      = $this->get('Total');
+		$this->pagination = $this->get('Pagination');
+		$this->state      = $this->get('State');
+
+		FinderHelper::addSubmenu('maps');
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode("\n", $errors));
+
 			return false;
 		}
 
+		JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+
 		// Prepare the view.
 		$this->addToolbar();
-
-		JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+		$this->sidebar = JHtmlSidebar::render();
 		parent::display($tpl);
 	}
 
@@ -63,31 +65,47 @@ class FinderViewMaps extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
-		// For whatever reason, the helper isn't being found
-		include_once JPATH_COMPONENT . '/helpers/finder.php';
-		$canDo	= FinderHelper::getActions();
+		$canDo = JHelperContent::getActions('com_finder');
 
-		JToolBarHelper::title(JText::_('COM_FINDER_MAPS_TOOLBAR_TITLE'), 'finder');
-		$toolbar = JToolBar::getInstance('toolbar');
+		JToolbarHelper::title(JText::_('COM_FINDER_MAPS_TOOLBAR_TITLE'), 'zoom-in finder');
+		$toolbar = JToolbar::getInstance('toolbar');
 
 		if ($canDo->get('core.edit.state'))
 		{
-			JToolBarHelper::publishList('maps.publish');
-			JToolBarHelper::unpublishList('maps.unpublish');
-			JToolBarHelper::divider();
+			JToolbarHelper::publishList('maps.publish');
+			JToolbarHelper::unpublishList('maps.unpublish');
+			JToolbarHelper::divider();
 		}
+
+		if ($canDo->get('core.admin') || $canDo->get('core.options'))
+		{
+			JToolbarHelper::preferences('com_finder');
+		}
+
+		JToolbarHelper::divider();
+		$toolbar->appendButton('Popup', 'bars', 'COM_FINDER_STATISTICS', 'index.php?option=com_finder&view=statistics&tmpl=component', 550, 350);
+		JToolbarHelper::divider();
+		JToolbarHelper::help('JHELP_COMPONENTS_FINDER_MANAGE_CONTENT_MAPS');
+
 		if ($canDo->get('core.delete'))
 		{
-			JToolBarHelper::deleteList('', 'maps.delete');
-			JToolBarHelper::divider();
+			JToolbarHelper::deleteList('', 'maps.delete');
+			JToolbarHelper::divider();
 		}
-		if ($canDo->get('core.admin'))
-		{
-			JToolBarHelper::preferences('com_finder');
-		}
-		JToolBarHelper::divider();
-		$toolbar->appendButton('Popup', 'stats', 'COM_FINDER_STATISTICS', 'index.php?option=com_finder&view=statistics&tmpl=component', 550, 500);
-		JToolBarHelper::divider();
-		JToolBarHelper::help('JHELP_COMPONENTS_FINDER_MANAGE_CONTENT_MAPS');
+
+		JHtmlSidebar::setAction('index.php?option=com_finder&view=maps');
+
+		JHtmlSidebar::addFilter(
+			'',
+			'filter_branch',
+			JHtml::_('select.options', JHtml::_('finder.mapslist'), 'value', 'text', $this->state->get('filter.branch')),
+			true
+		);
+
+		JHtmlSidebar::addFilter(
+			JText::_('COM_FINDER_INDEX_FILTER_BY_STATE'),
+			'filter_state',
+			JHtml::_('select.options', JHtml::_('finder.statelist'), 'value', 'text', $this->state->get('filter.state'))
+		);
 	}
 }

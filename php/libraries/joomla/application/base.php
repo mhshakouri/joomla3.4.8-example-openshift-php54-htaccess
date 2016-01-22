@@ -3,23 +3,23 @@
  * @package     Joomla.Platform
  * @subpackage  Application
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('JPATH_PLATFORM') or die;
 
-jimport('joomla.application.input');
-jimport('joomla.event.dispatcher');
+use Joomla\Application\AbstractApplication;
+use Joomla\Registry\Registry;
 
 /**
  * Joomla Platform Base Application Class
  *
- * @package     Joomla.Platform
- * @subpackage  Application
- * @since       12.1
+ * @property-read  JInput  $input  The application input object
+ *
+ * @since  12.1
  */
-abstract class JApplicationBase extends JObject
+abstract class JApplicationBase extends AbstractApplication
 {
 	/**
 	 * The application dispatcher object.
@@ -38,26 +38,23 @@ abstract class JApplicationBase extends JObject
 	protected $identity;
 
 	/**
-	 * The application input object.
+	 * Class constructor.
 	 *
-	 * @var    JInput
-	 * @since  12.1
-	 */
-	public $input = null;
-
-	/**
-	 * Method to close the application.
+	 * @param   JInput    $input   An optional argument to provide dependency injection for the application's
+	 *                             input object.  If the argument is a JInput object that object will become
+	 *                             the application's input object, otherwise a default input object is created.
+	 * @param   Registry  $config  An optional argument to provide dependency injection for the application's
+	 *                             config object.  If the argument is a Registry object that object will become
+	 *                             the application's config object, otherwise a default config object is created.
 	 *
-	 * @param   integer  $code  The exit code (optional; default is 0).
-	 *
-	 * @return  void
-	 *
-	 * @codeCoverageIgnore
 	 * @since   12.1
 	 */
-	public function close($code = 0)
+	public function __construct(JInput $input = null, Registry $config = null)
 	{
-		exit($code);
+		$this->input = $input instanceof JInput ? $input : new JInput;
+		$this->config = $config instanceof Registry ? $config : new Registry;
+
+		$this->initialise();
 	}
 
 	/**
@@ -76,7 +73,7 @@ abstract class JApplicationBase extends JObject
 	 * Registers a handler to a particular event group.
 	 *
 	 * @param   string    $event    The event name.
-	 * @param   callback  $handler  The handler, a function or an instance of a event object.
+	 * @param   callable  $handler  The handler, a function or an instance of a event object.
 	 *
 	 * @return  JApplicationBase  The application to allow chaining.
 	 *
@@ -84,7 +81,7 @@ abstract class JApplicationBase extends JObject
 	 */
 	public function registerEvent($event, $handler)
 	{
-		if ($this->dispatcher instanceof JDispatcher)
+		if ($this->dispatcher instanceof JEventDispatcher)
 		{
 			$this->dispatcher->register($event, $handler);
 		}
@@ -104,7 +101,7 @@ abstract class JApplicationBase extends JObject
 	 */
 	public function triggerEvent($event, array $args = null)
 	{
-		if ($this->dispatcher instanceof JDispatcher)
+		if ($this->dispatcher instanceof JEventDispatcher)
 		{
 			return $this->dispatcher->trigger($event, $args);
 		}
@@ -119,15 +116,15 @@ abstract class JApplicationBase extends JObject
 	 * but for many applications it will make sense to override this method and create event
 	 * dispatchers, if required, based on more specific needs.
 	 *
-	 * @param   JDispatcher  $dispatcher  An optional dispatcher object. If omitted, the factory dispatcher is created.
+	 * @param   JEventDispatcher  $dispatcher  An optional dispatcher object. If omitted, the factory dispatcher is created.
 	 *
 	 * @return  JApplicationBase This method is chainable.
 	 *
 	 * @since   12.1
 	 */
-	public function loadDispatcher(JDispatcher $dispatcher = null)
+	public function loadDispatcher(JEventDispatcher $dispatcher = null)
 	{
-		$this->dispatcher = ($dispatcher === null) ? JDispatcher::getInstance() : $dispatcher;
+		$this->dispatcher = ($dispatcher === null) ? JEventDispatcher::getInstance() : $dispatcher;
 
 		return $this;
 	}
@@ -151,4 +148,18 @@ abstract class JApplicationBase extends JObject
 
 		return $this;
 	}
+
+	/**
+	 * Method to run the application routines.  Most likely you will want to instantiate a controller
+	 * and execute it, or perform some sort of task directly.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.4 (CMS)
+	 */
+	protected function doExecute()
+	{
+		return;
+	}
+
 }

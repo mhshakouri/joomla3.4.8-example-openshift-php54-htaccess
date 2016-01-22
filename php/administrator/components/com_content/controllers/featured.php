@@ -1,35 +1,42 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Administrator
+ * @subpackage  com_content
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
 
-require_once dirname(__FILE__).'/articles.php';
+require_once __DIR__ . '/articles.php';
 
 /**
- * @package		Joomla.Administrator
- * @subpackage	com_content
+ * Featured content controller class.
+ *
+ * @since  1.6
  */
 class ContentControllerFeatured extends ContentControllerArticles
 {
 	/**
-	 * Removes an item
+	 * Removes an item.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.6
 	 */
-	function delete()
+	public function delete()
 	{
 		// Check for request forgeries
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		// Initialise variables.
-		$user	= JFactory::getUser();
-		$ids	= JRequest::getVar('cid', array(), '', 'array');
+		$user = JFactory::getUser();
+		$ids  = $this->input->get('cid', array(), 'array');
 
 		// Access checks.
 		foreach ($ids as $i => $id)
 		{
-			if (!$user->authorise('core.delete', 'com_content.article.'.(int) $id))
+			if (!$user->authorise('core.delete', 'com_content.article.' . (int) $id))
 			{
 				// Prune items that you can't delete.
 				unset($ids[$i]);
@@ -37,15 +44,18 @@ class ContentControllerFeatured extends ContentControllerArticles
 			}
 		}
 
-		if (empty($ids)) {
+		if (empty($ids))
+		{
 			JError::raiseWarning(500, JText::_('JERROR_NO_ITEMS_SELECTED'));
 		}
-		else {
+		else
+		{
 			// Get the model.
 			$model = $this->getModel();
 
 			// Remove the items.
-			if (!$model->featured($ids, 0)) {
+			if (!$model->featured($ids, 0))
+			{
 				JError::raiseWarning(500, $model->getError());
 			}
 		}
@@ -56,10 +66,11 @@ class ContentControllerFeatured extends ContentControllerArticles
 	/**
 	 * Method to publish a list of articles.
 	 *
-	 * @return	void
-	 * @since	1.0
+	 * @return  void
+	 *
+	 * @since   1.0
 	 */
-	function publish()
+	public function publish()
 	{
 		parent::publish();
 

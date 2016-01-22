@@ -3,13 +3,13 @@
  * @package     Joomla.Administrator
  * @subpackage  com_finder
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('_JEXEC') or die;
 
-JLoader::register('FinderIndexer', dirname(__FILE__) . '/indexer.php');
+JLoader::register('FinderIndexer', __DIR__ . '/indexer.php');
 
 /**
  * Result class for the Finder indexer package.
@@ -19,9 +19,7 @@ JLoader::register('FinderIndexer', dirname(__FILE__) . '/indexer.php');
  * declared will be pushed into the elements array and can be accessed
  * explicitly using the getElement() method.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_finder
- * @since       2.5
+ * @since  2.5
  */
 class FinderIndexerResult
 {
@@ -177,6 +175,24 @@ class FinderIndexerResult
 	 * @since  2.5
 	 */
 	public $type_id;
+
+	/**
+	 * The default language for content.
+	 *
+	 * @var    string
+	 * @since  3.0.2
+	 */
+	public $defaultLanguage;
+
+	/**
+	 * Constructor
+	 *
+	 * @since   3.0.3
+	 */
+	public function __construct()
+	{
+		$this->defaultLanguage = JComponentHelper::getParams('com_languages')->get('site', 'en-GB');
+	}
 
 	/**
 	 * The magic set method is used to push additional values into the elements
@@ -361,7 +377,7 @@ class FinderIndexerResult
 		if ($branch !== null && isset($this->taxonomy[$branch]))
 		{
 			// Filter the input.
-			$branch = preg_replace('#[^\pL\pM\pN\p{Pi}\p{Pf}\'+-.,]+#mui', ' ', $branch);
+			$branch = preg_replace('#[^\pL\pM\pN\p{Pi}\p{Pf}\'+-.,_]+#mui', ' ', $branch);
 
 			return $this->taxonomy[$branch];
 		}
@@ -384,7 +400,7 @@ class FinderIndexerResult
 	public function addTaxonomy($branch, $title, $state = 1, $access = 1)
 	{
 		// Filter the input.
-		$branch = preg_replace('#[^\pL\pM\pN\p{Pi}\p{Pf}\'+-.,]+#mui', ' ', $branch);
+		$branch = preg_replace('#[^\pL\pM\pN\p{Pi}\p{Pf}\'+-.,_]+#mui', ' ', $branch);
 
 		// Create the taxonomy node.
 		$node = new JObject;
@@ -394,5 +410,20 @@ class FinderIndexerResult
 
 		// Add the node to the taxonomy branch.
 		$this->taxonomy[$branch][$node->title] = $node;
+	}
+
+	/**
+	 * Method to set the item language
+	 *
+	 * @return  void
+	 *
+	 * @since   3.0
+	 */
+	public function setLanguage()
+	{
+		if ($this->language == '')
+		{
+			$this->language = $this->defaultLanguage;
+		}
 	}
 }

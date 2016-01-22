@@ -1,24 +1,23 @@
 <?php
 /**
- * @package		Joomla.Administrator
- * @subpackage	com_installer
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Administrator
+ * @subpackage  com_installer
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access.
 defined('_JEXEC') or die;
 
-// Import library dependencies
-JLoader::register('InstallerModel', dirname(__FILE__) . '/extension.php');
-JLoader::register('joomlaInstallerScript', JPATH_ADMINISTRATOR . '/components/com_admin/script.php');
+use Joomla\Registry\Registry;
+
+JLoader::register('InstallerModel', __DIR__ . '/extension.php');
+JLoader::register('JoomlaInstallerScript', JPATH_ADMINISTRATOR . '/components/com_admin/script.php');
 
 /**
  * Installer Manage Model
  *
- * @package		Joomla.Administrator
- * @subpackage	com_installer
- * @since		1.6
+ * @since  1.6
  */
 class InstallerModelDatabase extends InstallerModel
 {
@@ -29,7 +28,12 @@ class InstallerModelDatabase extends InstallerModel
 	 *
 	 * Note. Calling getState in this method will result in recursion.
 	 *
-	 * @since	1.6
+	 * @param   string  $ordering   An optional ordering field.
+	 * @param   string  $direction  An optional direction (asc|desc).
+	 *
+	 * @return  void
+	 *
+	 * @since   1.6
 	 */
 	protected function populateState($ordering = null, $direction = null)
 	{
@@ -42,183 +46,204 @@ class InstallerModelDatabase extends InstallerModel
 	}
 
 	/**
+	 * Fixes database problems.
 	 *
-	 * Fixes database problems
+	 * @return  void
 	 */
 	public function fix()
 	{
-		$changeSet = $this->getItems();
+		if (!$changeSet = $this->getItems())
+		{
+			return false;
+		}
+
 		$changeSet->fix();
 		$this->fixSchemaVersion($changeSet);
 		$this->fixUpdateVersion();
-		$installer = new joomlaInstallerScript();
+		$installer = new JoomlaInstallerScript;
 		$installer->deleteUnexistingFiles();
 		$this->fixDefaultTextFilters();
 	}
 
 	/**
-	 *
-	 * Gets the changeset object
+	 * Gets the changeset object.
 	 *
 	 * @return  JSchemaChangeset
 	 */
 	public function getItems()
 	{
 		$folder = JPATH_ADMINISTRATOR . '/components/com_admin/sql/updates/';
-		$changeSet = JSchemaChangeset::getInstance(JFactory::getDbo(), $folder);
+
+		try
+		{
+			$changeSet = JSchemaChangeset::getInstance($this->getDbo(), $folder);
+		}
+		catch (RuntimeException $e)
+		{
+			JFactory::getApplication()->enqueueMessage($e->getMessage(), 'warning');
+
+			return false;
+		}
 		return $changeSet;
 	}
 
+	/**
+	 * Method to get a JPagination object for the data set.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   12.2
+	 */
 	public function getPagination()
 	{
 		return true;
 	}
 
 	/**
-	 * Get version from #__schemas table
+	 * Get version from #__schemas table.
 	 *
-	 * @return  mixed  the return value from the query, or null if the query fails
+	 * @return  mixed  the return value from the query, or null if the query fails.
+	 *
 	 * @throws Exception
 	 */
-
-	public function getSchemaVersion() {
-		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('version_id')->from($db->qn('#__schemas'))
-		->where('extension_id = 700');
+	public function getSchemaVersion()
+	{
+		$db = $this->getDbo();
+		$query = $db->getQuery(true)
+			->select('version_id')
+			->from($db->quoteName('#__schemas'))
+			->where('extension_id = 700');
 		$db->setQuery($query);
 		$result = $db->loadResult();
-		if ($db->getErrorNum()) {
-			throw new Exception('Database error - getSchemaVersion');
-		}
+
 		return $result;
 	}
 
 	/**
-	 * Fix schema version if wrong
+	 * Fix schema version if wrong.
 	 *
-	 * @param JSchemaChangeSet
+	 * @param   JSchemaChangeSet  $changeSet  Schema change set.
 	 *
-	 * @return   mixed  string schema version if success, false if fail
+	 * @return   mixed  string schema version if success, false if fail.
 	 */
 	public function fixSchemaVersion($changeSet)
 	{
-		// Get correct schema version -- last file in array
+		// Get correct schema version -- last file in array.
 		$schema = $changeSet->getSchema();
-		$db = JFactory::getDbo();
-		$result = false;
 
-		// Check value. If ok, don't do update
-		$version = $this->getSchemaVersion();
-		if ($version == $schema)
+		// Check value. If ok, don't do update.
+		if ($schema == $this->getSchemaVersion())
 		{
-			$result = $version;
+			return $schema;
 		}
-		else
-		{
-			// Delete old row
-			$query = $db->getQuery(true);
-			$query->delete($db->qn('#__schemas'));
-			$query->where($db->qn('extension_id') . ' = 700');
-			$db->setQuery($query);
-			$db->query();
 
-			// Add new row
-			$query = $db->getQuery(true);
-			$query->insert($db->qn('#__schemas'));
-			$query->set($db->qn('extension_id') . '= 700');
-			$query->set($db->qn('version_id') . '= ' . $db->q($schema));
-			$db->setQuery($query);
-			if ($db->query()) {
-				$result = $schema;
-			}
+		// Delete old row.
+		$db = $this->getDbo();
+		$query = $db->getQuery(true)
+			->delete($db->quoteName('#__schemas'))
+			->where($db->quoteName('extension_id') . ' = 700');
+		$db->setQuery($query);
+		$db->execute();
+
+		// Add new row.
+		$query->clear()
+			->insert($db->quoteName('#__schemas'))
+			->columns($db->quoteName('extension_id') . ',' . $db->quoteName('version_id'))
+			->values('700, ' . $db->quote($schema));
+		$db->setQuery($query);
+
+		if (!$db->execute())
+		{
+			return false;
 		}
-		return $result;
+
+		return $schema;
 	}
 
 	/**
-	 * Get current version from #__extensions table
+	 * Get current version from #__extensions table.
 	 *
-	 * @return  mixed   version if successful, false if fail
+	 * @return  mixed   version if successful, false if fail.
 	 */
 
 	public function getUpdateVersion()
 	{
 		$table = JTable::getInstance('Extension');
 		$table->load('700');
-		$cache = new JRegistry($table->manifest_cache);
+		$cache = new Registry($table->manifest_cache);
+
 		return $cache->get('version');
 	}
 
 	/**
-	 * Fix Joomla version in #__extensions table if wrong (doesn't equal JVersion short version)
+	 * Fix Joomla version in #__extensions table if wrong (doesn't equal JVersion short version).
 	 *
-	 * @return   mixed  string update version if success, false if fail
+	 * @return   mixed  string update version if success, false if fail.
 	 */
 	public function fixUpdateVersion()
 	{
 		$table = JTable::getInstance('Extension');
 		$table->load('700');
-		$cache = new JRegistry($table->manifest_cache);
-		$updateVersion =  $cache->get('version');
-		$cmsVersion = new JVersion();
+		$cache = new Registry($table->manifest_cache);
+		$updateVersion = $cache->get('version');
+		$cmsVersion = new JVersion;
+
 		if ($updateVersion == $cmsVersion->getShortVersion())
 		{
 			return $updateVersion;
 		}
-		else
-		{
-			$cache->set('version', $cmsVersion->getShortVersion());
-			$table->manifest_cache = $cache->toString();
-			if ($table->store())
-			{
-				return $cmsVersion->getShortVersion();
-			}
-			else
-			{
-				return false;
-			}
 
+		$cache->set('version', $cmsVersion->getShortVersion());
+		$table->manifest_cache = $cache->toString();
+
+		if ($table->store())
+		{
+			return $cmsVersion->getShortVersion();
 		}
+
+		return false;
 	}
 
 	/**
 	 * For version 2.5.x only
 	 * Check if com_config parameters are blank.
 	 *
-	 * @return  string  default text filters (if any)
+	 * @return  string  default text filters (if any).
 	 */
 	public function getDefaultTextFilters()
 	{
 		$table = JTable::getInstance('Extension');
 		$table->load($table->find(array('name' => 'com_config')));
+
 		return $table->params;
 	}
+
 	/**
 	 * For version 2.5.x only
 	 * Check if com_config parameters are blank. If so, populate with com_content text filters.
 	 *
-	 * @return  mixed  boolean true if params are updated, null otherwise
+	 * @return  mixed  boolean true if params are updated, null otherwise.
 	 */
 	public function fixDefaultTextFilters()
 	{
 		$table = JTable::getInstance('Extension');
 		$table->load($table->find(array('name' => 'com_config')));
 
-		// Check for empty $config and non-empty content filters
+		// Check for empty $config and non-empty content filters.
 		if (!$table->params)
 		{
-			// Get filters from com_content and store if you find them
+			// Get filters from com_content and store if you find them.
 			$contentParams = JComponentHelper::getParams('com_content');
+
 			if ($contentParams->get('filters'))
 			{
-				$newParams = new JRegistry();
+				$newParams = new Registry;
 				$newParams->set('filters', $contentParams->get('filters'));
 				$table->params = (string) $newParams;
 				$table->store();
+
 				return true;
 			}
 		}
 	}
 }
-

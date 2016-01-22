@@ -3,19 +3,16 @@
  * @package     Joomla.Administrator
  * @subpackage  com_users
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// No direct access.
 defined('_JEXEC') or die;
 
 /**
  * Users component helper.
  *
- * @package     Joomla.Administrator
- * @subpackage  com_users
- * @since       1.6
+ * @since  1.6
  */
 class UsersHelper
 {
@@ -36,35 +33,35 @@ class UsersHelper
 	 */
 	public static function addSubmenu($vName)
 	{
-		JSubMenuHelper::addEntry(
+		JHtmlSidebar::addEntry(
 			JText::_('COM_USERS_SUBMENU_USERS'),
 			'index.php?option=com_users&view=users',
 			$vName == 'users'
 		);
 
 		// Groups and Levels are restricted to core.admin
-		$canDo = self::getActions();
+		$canDo = JHelperContent::getActions('com_users');
 
 		if ($canDo->get('core.admin'))
 		{
-			JSubMenuHelper::addEntry(
+			JHtmlSidebar::addEntry(
 				JText::_('COM_USERS_SUBMENU_GROUPS'),
 				'index.php?option=com_users&view=groups',
 				$vName == 'groups'
 			);
-			JSubMenuHelper::addEntry(
+			JHtmlSidebar::addEntry(
 				JText::_('COM_USERS_SUBMENU_LEVELS'),
 				'index.php?option=com_users&view=levels',
 				$vName == 'levels'
 			);
-			JSubMenuHelper::addEntry(
+			JHtmlSidebar::addEntry(
 				JText::_('COM_USERS_SUBMENU_NOTES'),
 				'index.php?option=com_users&view=notes',
 				$vName == 'notes'
 			);
 
-			$extension = JRequest::getString('extension');
-			JSubMenuHelper::addEntry(
+			$extension = JFactory::getApplication()->input->getString('extension');
+			JHtmlSidebar::addEntry(
 				JText::_('COM_USERS_SUBMENU_NOTE_CATEGORIES'),
 				'index.php?option=com_categories&extension=com_users',
 				$vName == 'categories' || $extension == 'com_users'
@@ -77,25 +74,17 @@ class UsersHelper
 	 *
 	 * @return  JObject
 	 *
-	 * @since   1.6
-	 * @todo    Refactor to work with notes
+	 * @deprecated  3.2  Use JHelperContent::getActions() instead
 	 */
 	public static function getActions()
 	{
-		if (empty(self::$actions))
-		{
-			$user = JFactory::getUser();
-			self::$actions = new JObject;
+		// Log usage of deprecated function
+		JLog::add(__METHOD__ . '() is deprecated, use JHelperContent::getActions() with new arguments order instead.', JLog::WARNING, 'deprecated');
 
-			$actions = JAccess::getActions('com_users');
+		// Get list of actions
+		$result = JHelperContent::getActions('com_users');
 
-			foreach ($actions as $action)
-			{
-				self::$actions->set($action->name, $user->authorise($action->name, 'com_users'));
-			}
-		}
-
-		return self::$actions;
+		return $result;
 	}
 
 	/**
@@ -105,7 +94,7 @@ class UsersHelper
 	 *
 	 * @since   1.6
 	 */
-	static function getStateOptions()
+	public static function getStateOptions()
 	{
 		// Build the filter options.
 		$options = array();
@@ -122,7 +111,7 @@ class UsersHelper
 	 *
 	 * @since   1.6
 	 */
-	static function getActiveOptions()
+	public static function getActiveOptions()
 	{
 		// Build the filter options.
 		$options = array();
@@ -139,28 +128,33 @@ class UsersHelper
 	 *
 	 * @since   1.6
 	 */
-	static function getGroups()
+	public static function getGroups()
 	{
 		$db = JFactory::getDbo();
-		$db->setQuery(
-			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
-			' FROM #__usergroups AS a' .
-			' LEFT JOIN '.$db->quoteName('#__usergroups').' AS b ON a.lft > b.lft AND a.rgt < b.rgt' .
-			' GROUP BY a.id, a.title, a.lft, a.rgt' .
-			' ORDER BY a.lft ASC'
-		);
-		$options = $db->loadObjectList();
+		$query = $db->getQuery(true)
+			->select('a.id AS value')
+			->select('a.title AS text')
+			->select('COUNT(DISTINCT b.id) AS level')
+			->from('#__usergroups as a')
+			->join('LEFT', '#__usergroups  AS b ON a.lft > b.lft AND a.rgt < b.rgt')
+			->group('a.id, a.title, a.lft, a.rgt')
+			->order('a.lft ASC');
+		$db->setQuery($query);
 
-		// Check for a database error.
-		if ($db->getErrorNum())
+		try
 		{
-			JError::raiseNotice(500, $db->getErrorMsg());
+			$options = $db->loadObjectList();
+		}
+		catch (RuntimeException $e)
+		{
+			JError::raiseNotice(500, $e->getMessage());
+
 			return null;
 		}
 
 		foreach ($options as &$option)
 		{
-			$option->text = str_repeat('- ', $option->level).$option->text;
+			$option->text = str_repeat('- ', $option->level) . $option->text;
 		}
 
 		return $options;
@@ -185,6 +179,46 @@ class UsersHelper
 			JHtml::_('select.option', 'past_year', JText::_('COM_USERS_OPTION_RANGE_PAST_YEAR')),
 			JHtml::_('select.option', 'post_year', JText::_('COM_USERS_OPTION_RANGE_POST_YEAR')),
 		);
+
+		return $options;
+	}
+
+	/**
+	 * Creates a list of two factor authentication methods used in com_users
+	 * on user view
+	 *
+	 * @return  array
+	 *
+	 * @since   3.2.0
+	 */
+	public static function getTwoFactorMethods()
+	{
+		// Load the Joomla! RAD layer
+		if (!defined('FOF_INCLUDED'))
+		{
+			include_once JPATH_LIBRARIES . '/fof/include.php';
+		}
+
+		FOFPlatform::getInstance()->importPlugin('twofactorauth');
+		$identities = FOFPlatform::getInstance()->runPlugins('onUserTwofactorIdentify', array());
+
+		$options = array(
+			JHtml::_('select.option', 'none', JText::_('JGLOBAL_OTPMETHOD_NONE'), 'value', 'text'),
+		);
+
+		if (!empty($identities))
+		{
+			foreach ($identities as $identity)
+			{
+				if (!is_object($identity))
+				{
+					continue;
+				}
+
+				$options[] = JHtml::_('select.option', $identity->method, $identity->title, 'value', 'text');
+			}
+		}
+
 		return $options;
 	}
 }

@@ -1,28 +1,26 @@
 <?php
 /**
- * @package		Joomla.Site
- * @subpackage	com_newsfeeds
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @package     Joomla.Site
+ * @subpackage  com_newsfeeds
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// no direct access
 defined('_JEXEC') or die;
-
-// Component Helper
-jimport('joomla.application.component.helper');
-jimport('joomla.application.categories');
 
 /**
  * Content Component Category Tree
  *
- * @static
- * @package		Joomla.Site
- * @subpackage	com_newsfeeds
- * @since 1.6
+ * @since  1.6
  */
 class NewsfeedsCategories extends JCategories
 {
+	/**
+	 * Constructor
+	 *
+	 * @param   array  $options  options
+	 */
 	public function __construct($options = array())
 	{
 		$options['table'] = '#__newsfeeds';

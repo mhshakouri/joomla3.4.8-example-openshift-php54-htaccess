@@ -3,13 +3,11 @@
  * @package     Joomla.Platform
  * @subpackage  Log
  *
- * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('JPATH_PLATFORM') or die;
-
-jimport('joomla.utilities.date');
 
 /**
  * Joomla! Log Entry class
@@ -17,9 +15,7 @@ jimport('joomla.utilities.date');
  * This class is designed to hold log entries for either writing to an engine, or for
  * supported engines, retrieving lists and building in memory (PHP based) search operations.
  *
- * @package     Joomla.Platform
- * @subpackage  Log
- * @since       11.1
+ * @since  11.1
  */
 class JLogEntry
 {
@@ -48,12 +44,12 @@ class JLogEntry
 	 * The priority of the message to be logged.
 	 * @var    string
 	 * @since  11.1
-	 * @see    $priorities
+	 * @see    JLogEntry::$priorities
 	 */
 	public $priority = JLog::INFO;
 
 	/**
-	 * List of available log priority levels [Based on the SysLog default levels].
+	 * List of available log priority levels [Based on the Syslog default levels].
 	 * @var    array
 	 * @since  11.1
 	 */
@@ -87,6 +83,7 @@ class JLogEntry
 		{
 			$priority = JLog::INFO;
 		}
+
 		$this->priority = $priority;
 
 		// Sanitize category if it exists.
