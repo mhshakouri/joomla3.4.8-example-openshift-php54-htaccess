@@ -44,9 +44,9 @@ class JConfig {
 	public $MetaKeys = '';
 	public $MetaAuthor = '1';
 	public $sef = '1';
-	public $sef_rewrite = '0';
+	public $sef_rewrite = '1';
 	public $sef_suffix = '0';
-	public $unicodeslugs = '0';
+	public $unicodeslugs = '1';
 	public $feed_limit = '10';
 	public $log_path = '';
 	public $tmp_path = '';
