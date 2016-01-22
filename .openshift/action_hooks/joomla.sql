@@ -1874,7 +1874,7 @@ CREATE TABLE IF NOT EXISTS `sfj8s_users` (
   KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO  `farin_DB`.`sh0zq_users` (
+INSERT INTO  `sfj8s_users` (
 `id` ,
 `name` ,
 `username` ,
