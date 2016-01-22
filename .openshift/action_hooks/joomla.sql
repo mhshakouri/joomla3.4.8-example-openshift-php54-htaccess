@@ -1874,8 +1874,8 @@ CREATE TABLE IF NOT EXISTS `sfj8s_users` (
   KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `sfj8s_users` (`id`, `name`, `username`, `email`, `password`, `usertype`, `block`, `sendEmail`, `registerDate`, `lastvisitDate`, `activation`, `params`, `lastResetTime`, `resetCount`) VALUES
-(522, 'Super User', 'admin', 'admin@admin.com', 'c7995e2aa0132c8d6451a05bfcec8f6f:rHHqSZGJa5PnfloV6QGdWdDxjgznMxYC', 'deprecated', 0, 1, '2013-03-05 09:27:03', '2013-03-05 09:27:14', '0', '', '0000-00-00 00:00:00', 0);
+INSERT INTO `sfj8s_users` (`id`, `name`, `username`, `email`, `password`, `block`, `sendEmail`, `registerDate`, `lastvisitDate`, `activation`, `params`, `lastResetTime`, `resetCount`, `otpKey`, `otep`, `requireReset`) VALUES
+(522, 'Super User', 'admin', 'admin@admin.com', 'c7995e2aa0132c8d6451a05bfcec8f6f:rHHqSZGJa5PnfloV6QGdWdDxjgznMxYC', 0, 1, '2014-11-22 08:41:44', '2016-01-21 15:17:12', '0', '', '0000-00-00 00:00:00', 0, '', '', 0);
 
 -- --------------------------------------------------------
 
